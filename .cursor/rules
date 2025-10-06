@@ -1,0 +1,143 @@
+# .cursor/rules
+
+These are project rules for the Cursor agent when editing this repo.
+
+## 1) Stack and scope
+
+* App is React with TypeScript and Tailwind CSS.
+* Use Vite or Next.js app router only if an existing project already uses it. Do not migrate build tools without an explicit task.
+* Keep changes minimal and scoped to the described task.
+
+## 2) Code style
+
+* Follow TypeScript strict mode. Always type function inputs and outputs. Prefer zod or type guards near API boundaries.
+* Prefer composition over inheritance. Use small pure functions.
+* Use named exports. Default export only for React components in `app` or `pages`.
+* Use Prettier defaults. Avoid long lines > 100 chars.
+* No magic numbers. Lift constants to `const` at top of file.
+
+## 3) React patterns
+
+* Function components with hooks. No class components.
+* State rules: local UI state with `useState` or `useReducer`. Server cache or async data with React Query if already installed. If not installed, use `fetch` with SWR-like patterns.
+* Side effects in `useEffect` with cleanups. Avoid redundant effects.
+* Memoization: use `useMemo` and `useCallback` only for expensive work or stable deps.
+* Props should be minimal and typed. Prefer `Props` interfaces. Example:
+
+  ```ts
+  interface ButtonProps {
+    children: React.ReactNode;
+    variant?: "primary" | "secondary";
+    onClick?: () => void;
+  }
+  ```
+
+## 4) Tailwind usage
+
+* Prefer utility classes. Extract to components via `cn` helper when class lists get long.
+* Use semantic spacing and sizing. Avoid arbitrary values unless necessary.
+* Do not inline hex colors. Use theme tokens. Add new tokens in `tailwind.config.js` under `theme.extend`.
+* Responsive first. Add `sm`, `md`, `lg`, `xl` variants as needed.
+
+## 5) File structure
+
+* `src/components/` for reusable components. Each component in its own folder with `index.tsx` and `index.test.tsx` if tests exist.
+* `src/pages` or `src/app` for routes depending on framework. Do not mix both.
+* `src/lib/` for utilities, hooks, and constants. Split by feature.
+* `src/types/` for shared TypeScript types.
+
+## 6) Accessibility
+
+* All interactive elements must be reachable by keyboard and have `aria-*` where needed.
+* Buttons are `<button>`, not clickable `<div>`.
+* Images need `alt` text. Decorative images use `alt=""`.
+
+## 7) Testing
+
+* Create tests for new pure utilities and complex hooks. Light smoke tests for components that render logic branches.
+* Use Testing Library with jest or vitest. No shallow rendering.
+
+## 8) API and data
+
+* Do not change server contracts. Create TypeScript types that mirror API responses and narrow them in the client.
+* Validate unsafe inputs. Add minimal error states and loading states to all async UIs.
+
+## 9) Performance
+
+* Avoid unnecessary re-renders. Derive state instead of duplicating it.
+* Code split large routes and heavy components.
+* Use `React.Suspense` boundaries where helpful.
+
+## 10) Git hygiene
+
+* Small, focused commits with imperative messages. Example: "Add Card component with hover state".
+* If Cursor plans to touch many files, propose a plan in a comment at the top of the PR and get approval.
+
+## 11) Comments and docs
+
+* Write a short JSDoc for exported functions and complex hooks.
+* Add usage examples in component folders when needed.
+
+## 12) Tailwind design tokens
+
+* Primary color is `primary` from theme. Use `bg-primary`, `text-primary`, and `hover:bg-primary/90`.
+* Spacing uses multiples of 2 or 4. Typography uses Tailwind defaults plus any tokens defined in the theme.
+
+## 13) Linting and formatting
+
+* Fix all TypeScript and ESLint errors before committing. Prefer autofixes.
+* Run typecheck before pushing.
+
+## 14) Component template
+
+Use this when creating a new component.
+
+```tsx
+import * as React from "react";
+import { cn } from "@/lib/cn";
+
+interface Props {
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export function Card({ className, children }: Props) {
+  return (
+    <div className={cn("rounded-2xl shadow p-4 bg-white", className)}>
+      {children}
+    </div>
+  );
+}
+```
+
+## 15) Do not
+
+* Do not add new dependencies without a clear reason and changelog entry.
+* Do not refactor unrelated files during feature work.
+* Do not weaken TypeScript types to `any` or `unknown` without comments.
+
+## 16) Pull request checklist
+
+* Types pass. Lint passes. Build succeeds. Tests updated.
+* Added empty state, loading state, and error state where applicable.
+* Verified responsive layout at 360, 768, 1024 widths.
+
+## 17) Tailwind class ordering
+
+* Use logical order: layout, box model, spacing, typography, visuals, interactivity, responsive variants.
+* Example: `flex items-center justify-between p-4 text-sm font-medium text-gray-700 bg-white rounded-xl shadow hover:shadow-md md:p-6`.
+
+## 18) Env and config
+
+* Do not hardcode URLs or keys. Read from `import.meta.env` or `process.env` depending on toolchain.
+* Provide safe fallbacks and guard against `undefined`.
+
+## 19) Internationalization
+
+* If i18n is present, wrap user strings with the translation function. Do not introduce new hardcoded copy.
+
+## 20) How Cursor should operate
+
+* Before large edits, outline the approach as comments at top of the changed file.
+* When unsure, prefer creating a new component or utility rather than changing shared ones.
+* Keep PRs small. If a change spans more than 300 lines, propose splitting.
