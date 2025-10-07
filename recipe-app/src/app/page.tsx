@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Card from '@/components/Card';
 import SearchBar from '@/components/SearchBar';
 import RecipeSection from '@/components/RecipeSection';
+import { myRecipes, discoverRecipes } from '@/data/recipes';
 
 export default function Home() {
   const [searchValue, setSearchValue] = useState('');
@@ -16,35 +17,26 @@ export default function Home() {
     setSearchValue('');
   };
 
-  // Sample recipe data
-  const myRecipes = [
-    { id: '1', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '2', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '3', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '4', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '5', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '6', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '7', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '8', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '9', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-  ];
+  const handleAddRecipe = () => {
+    // TODO: Implement add recipe functionality
+    console.log('Add recipe clicked');
+  };
 
-  const discoverRecipes = [
-    { id: '10', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '11', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '12', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '13', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '14', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '15', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '16', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '17', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-    { id: '18', image: '/images/butter-chicken.png', title: 'Butter Chicken' },
-  ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 gap-4">
+    <div className="flex flex-col items-center justify-center p-4 gap-4 py-8">
       <Card className="w-full max-w-md">
-        <h1 className="text-2xl text-center mb-4">Recipe App</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold text-gray-800">Recipe App</h1>
+          <button
+            onClick={handleAddRecipe}
+            className="bg-orange-500 hover:bg-orange-600 text-white w-12 h-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
         <SearchBar 
           value={searchValue}
           onChange={handleSearchChange}
@@ -52,8 +44,8 @@ export default function Home() {
           placeholder="Search recipes..."
         />
       </Card>
-      <RecipeSection header="My Recipes" items={myRecipes} />
-      <RecipeSection header="Discover" items={discoverRecipes} />
+      <RecipeSection header="My Recipes" items={myRecipes} viewMoreLink="/my-recipes" />
+      <RecipeSection header="Discover" items={discoverRecipes} viewMoreLink="/discover" />
     </div>
   );
 }
