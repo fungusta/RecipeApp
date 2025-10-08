@@ -11,6 +11,8 @@ interface RecipePageProps {
 
 export default async function RecipePage({ params }: RecipePageProps) {
     const resolvedParams = await params;
+
+    // TODO: Change to fetch from API
     const allRecipes = [...myRecipes, ...discoverRecipes];
     const recipe = allRecipes.find((r: Recipe) => r.id === resolvedParams.id);
 
