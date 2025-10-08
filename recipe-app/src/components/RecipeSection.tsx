@@ -46,12 +46,12 @@ export default function RecipeSection({ header, items, viewMoreLink }: RecipeSec
         )}
       </div>
       
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
         {items.map((item, index) => (
           <div
             key={item.id || index}
             onClick={() => handleRecipeClick(item.id)}
-            className="bg-white rounded-lg p-1 cursor-pointer hover:shadow-md transition-shadow duration-200 w-36 h-36 flex items-center justify-center overflow-hidden"
+            className="bg-white rounded-lg p-1 cursor-pointer hover:shadow-md transition-shadow duration-200 aspect-square flex items-center justify-center overflow-hidden"
           >
             <img
               src={item.image}

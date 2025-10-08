@@ -5,8 +5,10 @@ import Card from '@/components/Card';
 import SearchBar from '@/components/SearchBar';
 import RecipeSection from '@/components/RecipeSection';
 import { myRecipes, discoverRecipes } from '@/data/recipes';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
   const [searchValue, setSearchValue] = useState('');
 
   const handleSearchChange = (value: string) => {
@@ -18,8 +20,7 @@ export default function Home() {
   };
 
   const handleAddRecipe = () => {
-    // TODO: Implement add recipe functionality
-    console.log('Add recipe clicked');
+    router.push('/add-recipe');
   };
 
 
