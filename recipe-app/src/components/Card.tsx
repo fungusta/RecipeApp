@@ -12,7 +12,7 @@ export default function Card({
   className = '' 
 }: CardProps) {
   return (
-    <div className={`${backgroundColor} rounded-3xl shadow-lg p-6 ${className}`}>
+    <div className={`${backgroundColor} rounded-3xl shadow-[-3px_3px_4px_0_rgba(0,0,0,0.25)] p-6 ${className}`}>
       {children}
     </div>
   );

@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import Card from './Card';
+import CircularButton from './CircularButton';
 
 import { Recipe } from '@/data/recipes';
 
@@ -30,23 +31,25 @@ export default function RecipeSection({ header, items, viewMoreLink }: RecipeSec
   return (
     <Card 
       backgroundColor="bg-lime-300" 
-      className="mb-4 shadow-lg"
+      className="mb-4"
     >
       <div className="flex items-center justify-between mb-4">
         <div className="text-lg">{header}</div>
         {viewMoreLink && (
-          <button
+          <CircularButton
             onClick={handleViewMore}
-            className="bg-orange-500 hover:bg-orange-600 text-white w-10 h-10 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center"
+            variant="primary"
+            size="md"
+            title="View more recipes"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-          </button>
+          </CircularButton>
         )}
       </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+      <div className="grid grid-cols-3 gap-3">
         {items.map((item, index) => (
           <div
             key={item.id || index}
@@ -56,7 +59,7 @@ export default function RecipeSection({ header, items, viewMoreLink }: RecipeSec
             <img
               src={item.image}
               alt={item.title}
-              className="w-full h-full object-cover rounded"
+              className="w-40 h-40 object-cover rounded"
             />
           </div>
         ))}
