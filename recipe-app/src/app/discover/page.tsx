@@ -50,8 +50,7 @@ export default function DiscoverPage() {
                         className="bg-white cursor-pointer hover:shadow-lg transition-shadow duration-200"
                         onClick={() => handleRecipeClick(recipe.id)}
                     >
-                        <div className="flex items-center gap-4">
-                            {/* Image */}
+                            <div className="flex items-center gap-4">
                             <img 
                                 src={recipe.image} 
                                 alt={recipe.title}

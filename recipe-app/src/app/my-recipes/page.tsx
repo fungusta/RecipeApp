@@ -15,6 +15,7 @@ export default function MyRecipesPage() {
     const [showImportModal, setShowImportModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showLoadingModal, setShowLoadingModal] = useState(false);
+    const [importUrl, setImportUrl] = useState('');
 
     const handleAddRecipe = () => {
         router.push('/add-recipe');
@@ -33,14 +34,24 @@ export default function MyRecipesPage() {
         console.log('Importing recipes');
     }
 
-    const handleImportConfirm = () => {
+    const handleImportConfirm = async () => {
         setShowLoadingModal(true);
-        // Simulate loading
-        setTimeout(() => {
+        try {
+            const response = await fetch('/api/recipes/parse', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: importUrl })
+            });
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error('Error importing recipe:', error);
+        } finally {
             setShowLoadingModal(false);
             setShowImportModal(false);
-            console.log('Recipe import completed');
-        }, 2000);
+        }
     }
 
     return (
@@ -144,6 +155,13 @@ export default function MyRecipesPage() {
                                 type="text"
                                 placeholder="Paste your recipe link here (Instagram, Tiktok, or website)"
                                 className="w-full bg-transparent text-gray-600 placeholder-gray-500 focus:outline-none"
+                                value={importUrl}
+                                onChange={(e) => setImportUrl(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleImportConfirm();
+                                    }
+                                }}
                             />
                         </div>
 

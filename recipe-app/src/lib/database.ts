@@ -2,19 +2,33 @@ import mysql from 'mysql2/promise';
 
 // Function to get database configuration
 function getDbConfig() {
+  const dbPassword = process.env.DB_PASSWORD || '';
+  const dbHost = process.env.DB_HOST || 'localhost';
+  const dbUser = process.env.DB_USER || 'root';
+  const dbName = process.env.DB_NAME || 'recipe_db';
+  const dbPort = parseInt(process.env.DB_PORT || '3306');
+  
   console.log('Environment variables check:');
-  console.log('DB_HOST:', process.env.DB_HOST);
-  console.log('DB_USER:', process.env.DB_USER);
-  console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '[SET]' : '[NOT SET]');
-  console.log('DB_NAME:', process.env.DB_NAME);
-  console.log('DB_PORT:', process.env.DB_PORT);
+  console.log('DB_HOST:', dbHost);
+  console.log('DB_USER:', dbUser);
+  console.log('DB_PASSWORD:', dbPassword);
+  console.log('DB_NAME:', dbName);
+  console.log('DB_PORT:', dbPort);
+  
+  // Warn if password might have issues
+  if (dbPassword && (dbPassword.startsWith(' ') || dbPassword.endsWith(' '))) {
+    console.warn('⚠️ WARNING: DB_PASSWORD appears to have leading or trailing spaces!');
+  }
+  if (dbPassword && dbPassword.length === 0) {
+    console.warn('⚠️ WARNING: DB_PASSWORD is empty string!');
+  }
   
   return {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'recipe_db',
-    port: parseInt(process.env.DB_PORT || '3306'),
+    host: dbHost,
+    user: dbUser,
+    password: dbPassword,
+    database: dbName,
+    port: dbPort,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
