@@ -41,7 +41,7 @@ export default function AddRecipePage() {
   const addIngredient = () => {
     setFormData(prev => ({
       ...prev,
-      ingredients: [...prev.ingredients, { name: '', amount: '', icon: '🥄' }]
+      ingredients: [...prev.ingredients, { name: '' }]
     }));
   };
 
@@ -330,29 +330,7 @@ export default function AddRecipePage() {
               <div className="space-y-4">
                 {formData.ingredients.map((ingredient, index) => (
                   <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
-                        <input
-                          type="text"
-                          value={ingredient.icon || ''}
-                          onChange={(e) => handleIngredientChange(index, 'icon', e.target.value)}
-                          className="w-full px-0 py-2 bg-transparent border-none outline-none text-center focus:bg-white focus:bg-opacity-50 focus:rounded-md focus:px-3 transition-all duration-200"
-                          placeholder="🥄"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
-                        <input
-                          type="text"
-                          value={ingredient.amount}
-                          onChange={(e) => handleIngredientChange(index, 'amount', e.target.value)}
-                          className="w-full px-0 py-2 bg-transparent border-none outline-none text-center focus:bg-white focus:bg-opacity-50 focus:rounded-md focus:px-3 transition-all duration-200"
-                          placeholder="500g"
-                        />
-                      </div>
-
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                         <input

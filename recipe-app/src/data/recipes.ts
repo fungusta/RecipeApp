@@ -6,8 +6,6 @@ export interface Instruction {
 
 export interface Ingredient {
   name: string;
-  amount: string;
-  icon?: string;
 }
 
 export interface Recipe {
@@ -26,18 +24,18 @@ export const myRecipes: Recipe[] = [
     title: 'Classic Butter Chicken',
     description: 'A rich and creamy Indian curry made with tender chicken pieces in a tomato-based sauce with aromatic spices.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
-      { name: 'Butter', amount: '3 tbsp', icon: '🧈' },
-      { name: 'Cashews', amount: '1/4 cup', icon: '🥜' },
-      { name: 'Garam Masala', amount: '1 tsp', icon: '🌶️' },
-      { name: 'Turmeric', amount: '1/2 tsp', icon: '🟡' },
-      { name: 'Cumin', amount: '1 tsp', icon: '🌿' }
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
+      { name: 'Butter' },
+      { name: 'Cashews' },
+      { name: 'Garam Masala' },
+      { name: 'Turmeric' },
+      { name: 'Cumin' }
     ],
     instructions: [
       {
@@ -68,18 +66,18 @@ export const myRecipes: Recipe[] = [
     title: 'Spicy Butter Chicken',
     description: 'A fiery version of the classic butter chicken with extra heat from green chilies and red chili powder.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
-      { name: 'Butter', amount: '3 tbsp', icon: '🧈' },
-      { name: 'Cashews', amount: '1/4 cup', icon: '🥜' },
-      { name: 'Garam Masala', amount: '1 tsp', icon: '🌶️' },
-      { name: 'Turmeric', amount: '1/2 tsp', icon: '🟡' },
-      { name: 'Cumin', amount: '1 tsp', icon: '🌿' }
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
+      { name: 'Butter' },
+      { name: 'Cashews' },
+      { name: 'Garam Masala' },
+      { name: 'Turmeric' },
+      { name: 'Cumin' }
     ],
     instructions: [
       {
@@ -110,18 +108,18 @@ export const myRecipes: Recipe[] = [
     title: 'Creamy Butter Chicken',
     description: 'An extra creamy version with more cream and cashews for a luxurious, velvety texture.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
-      { name: 'Butter', amount: '3 tbsp', icon: '🧈' },
-      { name: 'Cashews', amount: '1/4 cup', icon: '🥜' },
-      { name: 'Garam Masala', amount: '1 tsp', icon: '🌶️' },
-      { name: 'Turmeric', amount: '1/2 tsp', icon: '🟡' },
-      { name: 'Cumin', amount: '1 tsp', icon: '🌿' }
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
+      { name: 'Butter' },
+      { name: 'Cashews' },
+      { name: 'Garam Masala' },
+      { name: 'Turmeric' },
+      { name: 'Cumin' }
     ],
     instructions: [
       {
@@ -152,18 +150,18 @@ export const myRecipes: Recipe[] = [
     title: 'Quick Butter Chicken',
     description: 'A simplified version that can be made in under 30 minutes using pre-made ingredients.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
-      { name: 'Butter', amount: '3 tbsp', icon: '🧈' },
-      { name: 'Cashews', amount: '1/4 cup', icon: '🥜' },
-      { name: 'Garam Masala', amount: '1 tsp', icon: '🌶️' },
-      { name: 'Turmeric', amount: '1/2 tsp', icon: '🟡' },
-      { name: 'Cumin', amount: '1 tsp', icon: '🌿' }
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
+      { name: 'Butter' },
+      { name: 'Cashews' },
+      { name: 'Garam Masala' },
+      { name: 'Turmeric' },
+      { name: 'Cumin' }
     ],
     instructions: [
       {
@@ -189,18 +187,18 @@ export const myRecipes: Recipe[] = [
     title: 'Healthy Butter Chicken',
     description: 'A lighter version using Greek yogurt instead of cream and minimal oil for a healthier option.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
-      { name: 'Butter', amount: '3 tbsp', icon: '🧈' },
-      { name: 'Cashews', amount: '1/4 cup', icon: '🥜' },
-      { name: 'Garam Masala', amount: '1 tsp', icon: '🌶️' },
-      { name: 'Turmeric', amount: '1/2 tsp', icon: '🟡' },
-      { name: 'Cumin', amount: '1 tsp', icon: '🌿' }
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
+      { name: 'Butter' },
+      { name: 'Cashews' },
+      { name: 'Garam Masala' },
+      { name: 'Turmeric' },
+      { name: 'Cumin' }
     ],
     instructions: [
       {
@@ -231,13 +229,13 @@ export const myRecipes: Recipe[] = [
     title: 'Traditional Butter Chicken',
     description: 'The authentic recipe passed down through generations with traditional cooking methods.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -268,13 +266,13 @@ export const myRecipes: Recipe[] = [
     title: 'Butter Chicken Biryani',
     description: 'A fusion dish combining butter chicken with aromatic basmati rice for a complete meal.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -305,13 +303,13 @@ export const myRecipes: Recipe[] = [
     title: 'Butter Chicken Pizza',
     description: 'A creative fusion combining butter chicken with pizza for an innovative twist.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -342,13 +340,13 @@ export const myRecipes: Recipe[] = [
     title: 'Butter Chicken Pasta',
     description: 'An Italian-Indian fusion combining butter chicken sauce with pasta for a unique dish.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -382,13 +380,13 @@ export const discoverRecipes: Recipe[] = [
     title: 'Chicken Tikka Masala',
     description: 'A British-Indian dish with grilled chicken in a creamy tomato-based sauce.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -419,13 +417,13 @@ export const discoverRecipes: Recipe[] = [
     title: 'Chicken Curry',
     description: 'A traditional Indian curry with tender chicken in a flavorful onion-tomato gravy.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -456,13 +454,13 @@ export const discoverRecipes: Recipe[] = [
     title: 'Chicken Biryani',
     description: 'Aromatic basmati rice layered with spiced chicken and cooked to perfection.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -493,13 +491,13 @@ export const discoverRecipes: Recipe[] = [
     title: 'Chicken Korma',
     description: 'A mild, creamy curry with chicken cooked in yogurt and nut-based sauce.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -530,13 +528,13 @@ export const discoverRecipes: Recipe[] = [
     title: 'Chicken Vindaloo',
     description: 'A spicy Goan curry with chicken marinated in vinegar and hot spices.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -567,13 +565,13 @@ export const discoverRecipes: Recipe[] = [
     title: 'Chicken Saag',
     description: 'Chicken cooked with spinach and aromatic spices in a creamy green sauce.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -604,13 +602,13 @@ export const discoverRecipes: Recipe[] = [
     title: 'Chicken Makhani',
     description: 'A rich and buttery chicken curry with a luxurious tomato-based sauce.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -641,13 +639,13 @@ export const discoverRecipes: Recipe[] = [
     title: 'Chicken Do Pyaza',
     description: 'A flavorful curry with double the onions for sweetness and depth.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {
@@ -678,13 +676,13 @@ export const discoverRecipes: Recipe[] = [
     title: 'Chicken Rogan Josh',
     description: 'A Kashmiri curry with chicken in a rich, aromatic red sauce.',
     ingredients: [
-      { name: 'Chicken', amount: '500g', icon: '🍗' },
-      { name: 'Tomatoes', amount: '4 medium', icon: '🍅' },
-      { name: 'Onions', amount: '2 large', icon: '🧅' },
-      { name: 'Garlic', amount: '4 cloves', icon: '🧄' },
-      { name: 'Ginger', amount: '1 inch', icon: '🫚' },
-      { name: 'Yogurt', amount: '1 cup', icon: '🥛' },
-      { name: 'Heavy Cream', amount: '1/2 cup', icon: '🥛' },
+      { name: 'Chicken' },
+      { name: 'Tomatoes' },
+      { name: 'Onions' },
+      { name: 'Garlic' },
+      { name: 'Ginger' },
+      { name: 'Yogurt' },
+      { name: 'Heavy Cream' },
     ],
     instructions: [
       {

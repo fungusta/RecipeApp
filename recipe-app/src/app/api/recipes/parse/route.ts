@@ -1,15 +1,22 @@
 import { createRecipe } from "@/lib/database";
 import { NextRequest, NextResponse } from "next/server";
 import { ensureDatabaseInitialized } from "@/lib/server-init";
-import recipeScraper from 'recipe-scraper';
+import { parseUrlToRecipeDataUsingRecipeScraper } from "@/lib/scrapers/recipeScraper";
+import { parseUrlToRecipeDataUsingJsonLdParser } from "@/lib/parsers/jsonLdParser";
 
 async function parseRecipe(url: string) {
     console.log(url);
-    // TODO: Add validation for the URL (Valid URL and also allowed domains for recipeScraper)
-    const recipe = await recipeScraper(url);
-   
-    console.log(recipe);
-    return recipe;
+    try {
+        // TODO: Add validation for the URL (Valid URL and also allowed domains for recipeScraper), not sure if still supported
+        const recipe = await parseUrlToRecipeDataUsingRecipeScraper(url);
+        console.log(recipe);
+        return recipe;
+    } catch (error) {
+        console.error('Error in parseRecipe:', error);
+        const recipeJsonLd = await parseUrlToRecipeDataUsingJsonLdParser(url);
+        console.log(recipeJsonLd);
+        return recipeJsonLd;
+    }
 }
 
 export async function POST(request: NextRequest) {
@@ -23,7 +30,14 @@ export async function POST(request: NextRequest) {
 
         console.log(parsedRecipe);
 
-        // await createRecipe(parsedRecipe);
+        await createRecipe({
+            title: parsedRecipe?.title || '',
+            description: parsedRecipe?.description || '',
+            ingredients: parsedRecipe?.ingredients || [],
+            instructions: parsedRecipe?.instructions || [],
+            image: parsedRecipe?.image || ''
+        });
+        
 
         return NextResponse.json({
             success: true,

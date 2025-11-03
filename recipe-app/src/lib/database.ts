@@ -1,3 +1,4 @@
+import { Ingredient, Instruction } from '@/data/recipes';
 import mysql from 'mysql2/promise';
 
 // Function to get database configuration
@@ -7,14 +8,7 @@ function getDbConfig() {
   const dbUser = process.env.DB_USER || 'root';
   const dbName = process.env.DB_NAME || 'recipe_db';
   const dbPort = parseInt(process.env.DB_PORT || '3306');
-  
-  console.log('Environment variables check:');
-  console.log('DB_HOST:', dbHost);
-  console.log('DB_USER:', dbUser);
-  console.log('DB_PASSWORD:', dbPassword);
-  console.log('DB_NAME:', dbName);
-  console.log('DB_PORT:', dbPort);
-  
+
   // Warn if password might have issues
   if (dbPassword && (dbPassword.startsWith(' ') || dbPassword.endsWith(' '))) {
     console.warn('⚠️ WARNING: DB_PASSWORD appears to have leading or trailing spaces!');
@@ -52,8 +46,8 @@ export interface Recipe {
   title: string;
   description: string;
   category?: string;
-  ingredients: string;
-  instructions: string;
+  ingredients: Ingredient[];
+  instructions: Instruction[];
   image?: string;
   createdAt?: string;
   updatedAt?: string;

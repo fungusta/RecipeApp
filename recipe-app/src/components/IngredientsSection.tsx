@@ -32,9 +32,8 @@ export default function IngredientsSection({ ingredients }: IngredientsSectionPr
           <div key={ingredient.name}>
             <div className="flex items-center justify-between py-3">
               <div className="flex items-center space-x-3">
-                <span className="text-2xl">{ingredient.icon}</span>
                 <span className="text-gray-800 font-medium">
-                  {ingredient.amount} {ingredient.name}
+                  {ingredient.name}
                 </span>
               </div>
               <input
