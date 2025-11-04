@@ -2,21 +2,33 @@ import { createRecipe } from "@/lib/database";
 import { NextRequest, NextResponse } from "next/server";
 import { ensureDatabaseInitialized } from "@/lib/server-init";
 import { parseUrlToRecipeDataUsingRecipeScraper } from "@/lib/scrapers/recipeScraper";
-import { parseUrlToRecipeDataUsingJsonLdParser } from "@/lib/parsers/jsonLdParser";
+import { parseUrlToRecipeDataUsingJsonLdScraper } from "@/lib/scrapers/jsonLdScraper";
+import { parseUrlToRecipeDataUsingMetaScraper } from "@/lib/scrapers/metaScraper";
 
 async function parseRecipe(url: string) {
     console.log(url);
-    try {
-        // TODO: Add validation for the URL (Valid URL and also allowed domains for recipeScraper), not sure if still supported
-        const recipe = await parseUrlToRecipeDataUsingRecipeScraper(url);
+    // TODO: Add validation for the URL (Valid URL and also allowed domains for recipeScraper), not sure if still supported
+    const recipe = await parseUrlToRecipeDataUsingRecipeScraper(url);
+    if (recipe !== null) {
         console.log(recipe);
         return recipe;
-    } catch (error) {
-        console.error('Error in parseRecipe:', error);
-        const recipeJsonLd = await parseUrlToRecipeDataUsingJsonLdParser(url);
+    }
+    
+    console.log('Recipe scraper returned null, falling back to JSON-LD scraper');
+    const recipeJsonLd = await parseUrlToRecipeDataUsingJsonLdScraper(url);
+    if (recipeJsonLd !== null) {
         console.log(recipeJsonLd);
         return recipeJsonLd;
     }
+
+    const recipeMeta = await parseUrlToRecipeDataUsingMetaScraper(url);
+    if (recipeMeta !== null) {
+        console.log(recipeMeta);
+        return recipeMeta;
+    }
+
+    console.log('No recipe found');
+    return null;
 }
 
 export async function POST(request: NextRequest) {

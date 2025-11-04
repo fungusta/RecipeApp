@@ -1,18 +1,20 @@
 import { Ingredient, Instruction, Recipe } from '@/data/recipes';
 import * as cheerio from 'cheerio';
 import sanitizeHtml from 'sanitize-html';
+import { filterRecipeData } from '@/lib/utils/filterRecipeData';
 
 /**
- * Parse recipe from URL using JSON-LD structured data.
+ * Scrape recipe from URL using JSON-LD structured data.
  * Falls back to HTML parsing if no JSON-LD Recipe schema is found.
  * 
- * @param url - The URL of the recipe page to parse
- * @returns Parsed Recipe object, or null if parsing fails
+ * @param url - The URL of the recipe page to scrape
+ * @returns Scraped Recipe object, or null if scraping fails
  */
-export async function parseUrlToRecipeDataUsingJsonLdParser(url: string): Promise<Recipe | null> {
+export async function parseUrlToRecipeDataUsingJsonLdScraper(url: string): Promise<Recipe | null> {
+    console.log('Scraping URL using JSON-LD Scraper:', url);
     const $ = await getCheerioFromUrl(url);
     if (!$) {
-        console.error('[JSON-LD Parser] Failed to fetch HTML from URL:', url);
+        console.error('[JSON-LD Scraper] Failed to fetch HTML from URL:', url);
         return null;
     }
 
@@ -38,7 +40,7 @@ export async function parseUrlToRecipeDataUsingJsonLdParser(url: string): Promis
             if (error instanceof SyntaxError) {
                 return; // Continue to next script
             }
-            console.error('[JSON-LD Parser] Error parsing script:', error instanceof Error ? error.message : String(error));
+            console.error('[JSON-LD Scraper] Error parsing script:', error instanceof Error ? error.message : String(error));
         }
     });
 
@@ -60,7 +62,7 @@ async function getCheerioFromUrl(url: string): Promise<cheerio.CheerioAPI | null
     try {
         return await cheerio.fromURL(url);
     } catch (error) {
-        console.error('[JSON-LD Parser] Failed to fetch URL:', url, error instanceof Error ? error.message : String(error));
+        console.error('[JSON-LD Scraper] Failed to fetch URL:', url, error instanceof Error ? error.message : String(error));
         return null;
     }
 }
@@ -124,13 +126,22 @@ function isRecipeType(type: any): boolean {
  * @returns Parsed Recipe object
  */
 function parseJsonLdRecipe(data: any, $: cheerio.CheerioAPI): Recipe {
+    const rawIngredients = extractIngredients(data);
+    const rawInstructions = extractInstructions(data);
+
+    // Filter unwanted content
+    const { ingredients, instructions } = filterRecipeData({
+        ingredients: rawIngredients.map(ing => ing.name),
+        instructions: rawInstructions
+    });
+
     return {
         id: Date.now().toString(),
         title: extractTitle(data),
         description: extractDescription(data),
         image: extractImage(data),
-        ingredients: extractIngredients(data),
-        instructions: extractInstructions(data)
+        ingredients,
+        instructions
     };
 }
 
@@ -291,8 +302,14 @@ function parseHtmlRecipe($: cheerio.CheerioAPI, url: string): Recipe | null {
 
     const description = extractHtmlDescription($);
     const image = extractHtmlImage($, url);
-    const ingredients = extractHtmlIngredients($);
-    const instructions = extractHtmlInstructions($);
+    const rawIngredients = extractHtmlIngredients($);
+    const rawInstructions = extractHtmlInstructions($);
+
+    // Filter unwanted content
+    const { ingredients, instructions } = filterRecipeData({
+        ingredients: rawIngredients.map(ing => ing.name),
+        instructions: rawInstructions
+    });
 
     return {
         id: Date.now().toString(),
@@ -494,3 +511,4 @@ function extractHtmlInstructions($: cheerio.CheerioAPI): Instruction[] {
 
     return instructions;
 }
+

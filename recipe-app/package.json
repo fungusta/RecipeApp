@@ -10,6 +10,12 @@
   },
   "dependencies": {
     "cheerio": "^1.1.2",
+    "got": "^14.6.2",
+    "metascraper": "^5.49.5",
+    "metascraper-description": "^5.49.5",
+    "metascraper-image": "^5.49.5",
+    "metascraper-title": "^5.49.5",
+    "metascraper-url": "^5.49.5",
     "mysql2": "^3.15.1",
     "next": "15.5.4",
     "react": "19.1.0",
