@@ -2,7 +2,7 @@ import { Ingredient, Instruction, Recipe } from '@/data/recipes';
 import * as cheerio from 'cheerio';
 import sanitizeHtml from 'sanitize-html';
 import { filterRecipeData } from '@/lib/utils/filterRecipeData';
-import { fetchHtml } from '@/lib/utils/fetchHtml';
+import { fetchHtml, FetchError } from '@/lib/utils/fetchHtml';
 
 /**
  * Scrape recipe from URL using JSON-LD structured data.
@@ -22,6 +22,8 @@ export async function parseUrlToRecipeDataUsingJsonLdScraper(url: string): Promi
     const scripts = $('script[type="application/ld+json"]');
     let recipe: Recipe | null = null;
 
+    console.log(`[JSON-LD Scraper] Found ${scripts.length} JSON-LD script(s)`);
+
     // Loop through all JSON-LD scripts until we find a Recipe
     scripts.each((index, element) => {
         const scriptContent = $(element).html();
@@ -29,16 +31,21 @@ export async function parseUrlToRecipeDataUsingJsonLdScraper(url: string): Promi
 
         try {
             const data = JSON.parse(scriptContent);
+            console.log(`[JSON-LD Scraper] Successfully parsed JSON, searching for recipe...`);
             const recipeData = findRecipeInJsonLd(data);
 
             if (recipeData) {
+                console.log(`[JSON-LD Scraper] Found recipe data!`);
                 recipe = parseJsonLdRecipe(recipeData, $);
                 return false; // Stop iteration
+            } else {
+                console.log(`[JSON-LD Scraper] No recipe found in script ${index + 1}`);
             }
         } catch (error) {
-            // Silently skip malformed JSON-LD scripts
-            // Only log if it's a non-JSON parsing error
+            // Log JSON parsing errors for debugging
             if (error instanceof SyntaxError) {
+                console.error(`[JSON-LD Scraper] JSON syntax error in script ${index + 1}:`, error.message);
+                console.error(`[JSON-LD Scraper] First 200 chars of content:`, scriptContent.substring(0, 200));
                 return; // Continue to next script
             }
             console.error('[JSON-LD Scraper] Error parsing script:', error instanceof Error ? error.message : String(error));
@@ -63,13 +70,13 @@ export async function parseUrlToRecipeDataUsingJsonLdScraper(url: string): Promi
 async function getCheerioFromUrl(url: string): Promise<cheerio.CheerioAPI | null> {
     try {
         const html = await fetchHtml(url);
-        if (!html) {
-            return null;
-        }
         return cheerio.load(html);
     } catch (error) {
-        console.error('[JSON-LD Scraper] Failed to fetch URL:', url, error instanceof Error ? error.message : String(error));
-        return null;
+        if (error instanceof FetchError) {
+            console.error('[JSON-LD Scraper] Failed to fetch URL:', url, error.message);
+            return null;
+        }
+        throw error;
     }
 }
 
@@ -80,34 +87,42 @@ async function getCheerioFromUrl(url: string): Promise<cheerio.CheerioAPI | null
  * @param data - The JSON-LD data to search
  * @returns Recipe object if found, null otherwise
  */
-function findRecipeInJsonLd(data: any): any | null {
+function findRecipeInJsonLd(data: any, depth: number = 0): any | null {
     if (!data) return null;
+    
+    // Prevent infinite recursion
+    if (depth > 10) return null;
 
-    // Direct match
-    if (isRecipeType(data['@type'])) return data;
+    // Direct match - check if this object itself is a Recipe
+    if (isRecipeType(data['@type'])) {
+        console.log(`[JSON-LD Scraper] Found recipe at depth ${depth}, type:`, data['@type']);
+        return data;
+    }
 
     // Array form
     if (Array.isArray(data)) {
+        console.log(`[JSON-LD Scraper] Processing array with ${data.length} items at depth ${depth}`);
         for (const item of data) {
-            const found = findRecipeInJsonLd(item);
+            const found = findRecipeInJsonLd(item, depth + 1);
             if (found) return found;
         }
     }
 
     // @graph property
     if (Array.isArray(data['@graph'])) {
+        console.log(`[JSON-LD Scraper] Processing @graph with ${data['@graph'].length} items at depth ${depth}`);
         for (const item of data['@graph']) {
-            const found = findRecipeInJsonLd(item);
+            const found = findRecipeInJsonLd(item, depth + 1);
             if (found) return found;
         }
     }
 
     // Nested objects (mainEntity, itemListElement, etc.)
-    if (typeof data === 'object') {
+    if (typeof data === 'object' && !Array.isArray(data)) {
         for (const key in data) {
             const val = data[key];
             if (val && typeof val === 'object') {
-                const found = findRecipeInJsonLd(val);
+                const found = findRecipeInJsonLd(val, depth + 1);
                 if (found) return found;
             }
         }

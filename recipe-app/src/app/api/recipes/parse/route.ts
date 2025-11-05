@@ -1,11 +1,11 @@
-import { createRecipe } from "@/lib/database";
+import { createRecipe, Recipe } from "@/lib/database";
 import { NextRequest, NextResponse } from "next/server";
 import { ensureDatabaseInitialized } from "@/lib/server-init";
 import { parseUrlToRecipeDataUsingRecipeScraper } from "@/lib/scrapers/recipeScraper";
 import { parseUrlToRecipeDataUsingJsonLdScraper } from "@/lib/scrapers/jsonLdScraper";
 import { parseUrlToRecipeDataUsingMetaScraper } from "@/lib/scrapers/metaScraper";
 
-async function parseRecipe(url: string) {
+async function parseRecipe(url: string): Promise<Recipe | null> {
     console.log(url);
     // TODO: Add validation for the URL (Valid URL and also allowed domains for recipeScraper), not sure if still supported
     const recipe = await parseUrlToRecipeDataUsingRecipeScraper(url);
@@ -40,7 +40,12 @@ export async function POST(request: NextRequest) {
 
         const parsedRecipe = await parseRecipe(body.url);
 
-        console.log(parsedRecipe);
+        if (parsedRecipe === null) {
+            return NextResponse.json({
+                success: false,
+                error: 'No recipe found'
+            }, { status: 404 });
+        }
 
         await createRecipe({
             title: parsedRecipe?.title || '',

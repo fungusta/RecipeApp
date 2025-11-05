@@ -1,65 +1,28 @@
 import { parseUrlToRecipeDataUsingJsonLdScraper } from '@/lib/scrapers/jsonLdScraper';
+import { allrecipesRecipe, bbcGoodFoodRecipe } from '@/lib/utils/testFixtures';
 
 jest.mock('@/lib/utils/fetchHtml', () => ({
     fetchHtml: jest.fn((url: string) => {
         if (url.includes('allrecipes.com')) {
-            return Promise.resolve(`
-                <html>
-                    <head>
-                        <script type="application/ld+json">
-                        {
-                            "@type": "Recipe",
-                            "name": "Simple Macaroni and Cheese",
-                            "description": "A delicious mac and cheese recipe",
-                            "image": "https://example.com/mac-cheese.jpg",
-                            "recipeIngredient": ["8 ounces macaroni", "2 cups cheddar cheese", "2 cups milk"],
-                            "recipeInstructions": [
-                                {"@type": "HowToStep", "text": "Cook macaroni according to package directions"},
-                                {"@type": "HowToStep", "text": "Drain and return to pot"},
-                                {"@type": "HowToStep", "text": "Stir in cheese and milk until melted"}
-                            ]
-                        }
-                        </script>
-                    </head>
-                    <body></body>
-                </html>
-            `);
+            return Promise.resolve(allrecipesRecipe);
         } else if (url.includes('bbcgoodfood.com')) {
-            return Promise.resolve(`
-                <html>
-                    <head>
-                        <script type="application/ld+json">
-                        {
-                            "@type": "Recipe",
-                            "name": "Rhubarb custard scones",
-                            "description": "Light and fluffy scones with rhubarb",
-                            "image": "https://example.com/scones.jpg",
-                            "recipeIngredient": ["350g self-raising flour", "85g butter", "3 tbsp caster sugar", "175ml milk", "200g rhubarb"],
-                            "recipeInstructions": [
-                                {"@type": "HowToStep", "text": "Heat oven to 220C"},
-                                {"@type": "HowToStep", "text": "Mix flour, butter and sugar"},
-                                {"@type": "HowToStep", "text": "Add milk and rhubarb"},
-                                {"@type": "HowToStep", "text": "Bake for 12-15 mins"}
-                            ]
-                        }
-                        </script>
-                    </head>
-                    <body></body>
-                </html>
-            `);
+            return Promise.resolve(bbcGoodFoodRecipe);
         } else {
             return Promise.resolve('<html><body>Not a recipe page</body></html>');
         }
+    }),
+    FetchError: jest.fn().mockImplementation((message: string, url: string, originalError?: unknown) => {
+        return new Error(message);
     })
 }));
 
-const validAllRecipeUrl = 'https://www.allrecipes.com/recipe/238691/simple-macaroni-and-cheese/';
-const validBBCGoodFoodUrl = 'https://www.bbcgoodfood.com/recipes/rhubarb-custard-scones';
+const validRecipeUrl = 'https://www.allrecipes.com/recipe/238691/simple-macaroni-and-cheese/';
+const validBBCGoodFoodRecipeUrl = 'https://www.bbcgoodfood.com/recipes/slow-cooker-pork-casserole';
 const invalidRecipeUrl = 'https://www.google.com';
 
 describe('jsonLdScraper', () => {
-    it('should parse the recipe data from the All Recipes url', async () => {
-        const recipe = await parseUrlToRecipeDataUsingJsonLdScraper(validAllRecipeUrl);
+    it('should parse the recipe data from the recipe url', async () => {
+        const recipe = await parseUrlToRecipeDataUsingJsonLdScraper(validRecipeUrl);
         expect(recipe).toEqual({
             id: expect.any(String),
             title: expect.any(String),
@@ -68,22 +31,34 @@ describe('jsonLdScraper', () => {
             ingredients: expect.any(Array),
             instructions: expect.any(Array)
         });
-    });
 
-    it('should parse the recipe data from the BBC Good Food url', async () => {
-        const recipe = await parseUrlToRecipeDataUsingJsonLdScraper(validBBCGoodFoodUrl);
-        expect(recipe).toEqual({
-            id: expect.any(String),
-            title: expect.any(String),
-            description: expect.any(String),
-            image: expect.any(String),
-            ingredients: expect.any(Array),
-            instructions: expect.any(Array)
-        });
+        expect(recipe?.title).toBe('Simple Macaroni and Cheese');
+        expect(recipe?.description).toBe('This mac and cheese recipe is simple to prepare...');
+        expect(recipe?.image).toBe('https://www.allrecipes.com/thmb/xI5g0WBP8yPHwRt1Nt5WudTctzE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/238691-Simple-Macaroni-And-Cheese.jpg');
+        expect(recipe?.ingredients).toEqual([{ name: '1 (8 ounce) box elbow macaroni' }, { name: '0.25 cup butter' }, { name: '0.25 cup all-purpose flour' }]);
+        expect(recipe?.instructions).toEqual([{ title: 'Gather the ingredients.', description: 'Gather the ingredients' }]);
     });
 
     it('should return null if the url is not a valid recipe url', async () => {
         const recipe = await parseUrlToRecipeDataUsingJsonLdScraper(invalidRecipeUrl);
         expect(recipe).toBeNull();
+    });
+
+    it('should parse the recipe data from the BBC Good Food url', async () => {
+        const recipe = await parseUrlToRecipeDataUsingJsonLdScraper(validBBCGoodFoodRecipeUrl);
+        expect(recipe).toEqual({
+            id: expect.any(String),
+            title: expect.any(String),
+            description: expect.any(String),
+            image: expect.any(String),
+            ingredients: expect.any(Array),
+            instructions: expect.any(Array)
+        });
+
+        expect(recipe?.title).toBe('Slow cooker recipes');
+        expect(recipe?.description).toBe('We love slow cookers at Good Food! Put your trusty kitchen gadget to use with our easy slow cooker recipes, including soups, stews, chillies and curries.');
+        expect(recipe?.image).toBe('https://images.immediate.co.uk/production/volatile/sites/30/2022/04/Slow-cooker-recipes-2a91dec.jpg?resize=768,845');
+        expect(recipe?.ingredients).toEqual([{ name: '1 pound beef' }, { name: '2 cups chicken' }, { name: '3 cups vegetables' }, { name: '1 pound lamb' }, { name: '1 pound pork' }, { name: '1 pound turkey' }]);
+        expect(recipe?.instructions).toEqual([{ title: 'Slow cook the beef in the slow cooker for 4-5 hours on low heat.', description: 'Slow cook the beef in the slow cooker for 4-5 hours on low heat' }]);
     });
 });
