@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
     return config;
   },
   // Mark packages with native dependencies as external for server components
-  serverComponentsExternalPackages: ['re2', 'metascraper'],
+  serverExternalPackages: ['re2', 'metascraper'],
 };
 
 export default nextConfig;

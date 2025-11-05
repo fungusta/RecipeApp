@@ -2,6 +2,7 @@ import { Ingredient, Instruction, Recipe } from '@/data/recipes';
 import * as cheerio from 'cheerio';
 import sanitizeHtml from 'sanitize-html';
 import { filterRecipeData } from '@/lib/utils/filterRecipeData';
+import { fetchHtml } from '@/lib/utils/fetchHtml';
 
 /**
  * Scrape recipe from URL using JSON-LD structured data.
@@ -54,13 +55,18 @@ export async function parseUrlToRecipeDataUsingJsonLdScraper(url: string): Promi
 
 /**
  * Fetch HTML from URL and return Cheerio instance.
+ * Uses fetchHtml utility with got for better header control and reliability.
  * 
  * @param url - The URL to fetch
  * @returns Cheerio API instance, or null if fetch fails
  */
 async function getCheerioFromUrl(url: string): Promise<cheerio.CheerioAPI | null> {
     try {
-        return await cheerio.fromURL(url);
+        const html = await fetchHtml(url);
+        if (!html) {
+            return null;
+        }
+        return cheerio.load(html);
     } catch (error) {
         console.error('[JSON-LD Scraper] Failed to fetch URL:', url, error instanceof Error ? error.message : String(error));
         return null;

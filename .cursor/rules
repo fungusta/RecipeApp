@@ -55,7 +55,7 @@ These are project rules for the Cursor agent when editing this repo.
 ## 7) Testing
 
 * Create tests for new pure utilities and complex hooks. Light smoke tests for components that render logic branches.
-* Use Testing Library with jest or vitest. No shallow rendering.
+* Use Testing Library with jest. No shallow rendering.
 
 ## 8) API and data
 
