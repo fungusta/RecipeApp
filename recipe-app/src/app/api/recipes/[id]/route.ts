@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { deleteRecipe, getRecipeById, updateRecipe } from '@/lib/database';
 import { ensureDatabaseInitialized } from '@/lib/server-init';
 
-export async function GET({ params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: {params: Promise<{ id: string }>}) {
     try {
-        // Ensure database is initialized
         await ensureDatabaseInitialized();
 
-        const recipeId = params.id;
+        const resolvedParams = await params;
+        const recipeId = resolvedParams.id;
 
         const recipe = await getRecipeById(recipeId);
 
@@ -40,12 +40,13 @@ export async function GET({ params }: { params: { id: string } }) {
     }
 }
 
-export async function DELETE({ params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: {params: Promise<{ id: string }>}) {
     try {
         // Ensure database is initialized
         await ensureDatabaseInitialized();        
 
-        const recipeId = params.id;
+        const resolvedParams = await params;
+        const recipeId = resolvedParams.id;
 
         const success = await deleteRecipe(recipeId);
 
@@ -66,12 +67,13 @@ export async function DELETE({ params }: { params: { id: string } }) {
     }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         // Ensure database is initialized
         await ensureDatabaseInitialized();
         
-        const recipeId = params.id;
+        const resolvedParams = await params;
+        const recipeId = resolvedParams.id;
         const body = await request.json();
 
         const success = await updateRecipe(recipeId, body);

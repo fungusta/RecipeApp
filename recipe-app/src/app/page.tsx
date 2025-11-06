@@ -46,7 +46,7 @@ export default function Home() {
         body: JSON.stringify({ url: importUrl })
       });
       const data = await response.json();
-      console.log(data);
+      router.push('/recipes/' + data.data.id);
     } catch (error) {
       console.error('Error importing recipe:', error);
     } finally {

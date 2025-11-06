@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
             }, { status: 404 });
         }
 
-        await createRecipe({
+        const createdRecipe = await createRecipe({
             title: parsedRecipe?.title || '',
             description: parsedRecipe?.description || '',
             ingredients: parsedRecipe?.ingredients || [],
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            data: parsedRecipe,
+            data: createdRecipe,
             message: 'Recipe parsed successfully'
         });
     } catch (error) {

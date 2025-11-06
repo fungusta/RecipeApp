@@ -1,20 +1,17 @@
-import { myRecipes, discoverRecipes, Recipe } from '@/data/recipes';
 import Card from '@/components/Card';
 import IngredientsSection from '@/components/IngredientsSection';
 import CookingSection from '@/components/CookingSection';
+import { getRecipeById } from '@/lib/database';
 
-interface RecipePageProps {
-    params: {
-        id: string;
-    };
+interface PageProps {
+    params: Promise<{ id: string }>;
 }
 
-export default async function RecipePage({ params }: RecipePageProps) {
+export default async function RecipePage({ params }: PageProps) {
     const resolvedParams = await params;
+    const recipeId = resolvedParams.id;
 
-    // TODO: Change to fetch from API
-    const allRecipes = [...myRecipes, ...discoverRecipes];
-    const recipe = allRecipes.find((r: Recipe) => r.id === resolvedParams.id);
+    const recipe = await getRecipeById(recipeId);
 
     if (!recipe) {
         return (
@@ -27,23 +24,36 @@ export default async function RecipePage({ params }: RecipePageProps) {
         );
     }
 
+    // Parse JSON fields if they're strings
+    const parsedRecipe = {
+        ...recipe,
+        ingredients: typeof recipe.ingredients === 'string'
+            ? JSON.parse(recipe.ingredients)
+            : recipe.ingredients,
+        instructions: typeof recipe.instructions === 'string'
+            ? JSON.parse(recipe.instructions)
+            : recipe.instructions
+    };
+
     return (
         <div className="flex flex-col items-center justify-center p-4 gap-4 py-8">
             <Card className="w-full max-w-4xl" backgroundColor="bg-orange-400">
                 <div className="flex flex-col items-center mb-4">
-                    <img
-                        src={recipe.image}
-                        alt={recipe.title}
-                        className="w-32 h-32 object-cover rounded-lg mb-4"
-                    />
-                    <h1 className="text-2xl text-center mb-4">{recipe.title}</h1>
-                    <p className="text-lg text-center">{recipe.description}</p>
+                    {parsedRecipe.image && (
+                        <img
+                            src={parsedRecipe.image}
+                            alt={parsedRecipe.title}
+                            className="w-32 h-32 object-cover rounded-lg mb-4"
+                        />
+                    )}
+                    <h1 className="text-2xl text-center mb-4">{parsedRecipe.title}</h1>
+                    <p className="text-lg text-center">{parsedRecipe.description}</p>
                 </div>
             </Card>
 
-            <IngredientsSection ingredients={recipe.ingredients} />
+            <IngredientsSection ingredients={parsedRecipe.ingredients} />
             
-            <CookingSection instructions={recipe.instructions} />
+            <CookingSection instructions={parsedRecipe.instructions} />
             
             <Card className="w-full max-w-4xl">
                 <p className="text-gray-500 text-center">More recipe content will be added here...</p>
