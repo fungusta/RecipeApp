@@ -49,6 +49,8 @@ export interface Recipe {
   ingredients: Ingredient[];
   instructions: Instruction[];
   image?: string;
+  creatorId?: string;
+  recipeUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -63,6 +65,8 @@ export async function initializeDatabase() {
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS recipes (
         id VARCHAR(255) PRIMARY KEY,
+        creator_id VARCHAR(255) NOT NULL,
+        recipe_url VARCHAR(500),
         title VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
         category VARCHAR(100),
@@ -112,6 +116,22 @@ export async function getRecipeById(id: string): Promise<Recipe | null> {
   }
 }
 
+// Get Recipes of a certain creator
+export async function getRecipesByCreatorId(creatorId: string): Promise<Recipe[]> {
+  try {
+    const pool = getPool();
+    const [rows] = await pool.execute(
+      'SELECT * FROM recipes WHERE creator_id = ?',
+      [creatorId]
+    );
+    const recipes = rows as Recipe[];
+    return recipes;
+  } catch (error) {
+    console.error(`Error fetching recipes for creator: ${creatorId}`, error);
+    throw error;
+  }
+}
+
 // Create new recipe
 export async function createRecipe(recipeData: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>): Promise<Recipe> {
   try {
@@ -120,10 +140,12 @@ export async function createRecipe(recipeData: Omit<Recipe, 'id' | 'createdAt' |
     const now = new Date();
     
     await pool.execute(
-      `INSERT INTO recipes (id, title, description, category, ingredients, instructions, image, created_at, updated_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO recipes (id, creator_id, recipe_url, title, description, category, ingredients, instructions, image, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
+        recipeData.creatorId || 'placeholder',
+        recipeData.recipeUrl || null,
         recipeData.title,
         recipeData.description,
         recipeData.category || null,

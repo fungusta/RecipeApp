@@ -96,6 +96,8 @@ export async function POST(request: NextRequest) {
     // Create recipe in database
     const newRecipe = await createRecipe({
       title: body.title,
+      // creatorId: body.creatorId,
+      recipeUrl: body.recipeUrl,
       description: body.description,
       category: body.category,
       ingredients: body.ingredients || [],

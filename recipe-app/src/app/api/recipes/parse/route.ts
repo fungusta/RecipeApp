@@ -49,6 +49,8 @@ export async function POST(request: NextRequest) {
 
         const createdRecipe = await createRecipe({
             title: parsedRecipe?.title || '',
+            creatorId: parsedRecipe?.creatorId || 'placeholder',
+            recipeUrl: body.url || '',
             description: parsedRecipe?.description || '',
             ingredients: parsedRecipe?.ingredients || [],
             instructions: parsedRecipe?.instructions || [],
