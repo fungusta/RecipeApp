@@ -7,7 +7,7 @@ import metascraperImage from 'metascraper-image';
 import customRules from "@/lib/utils/customRules";
 import { filterRecipeData } from "@/lib/utils/filterRecipeData";
 
-export async function parseUrlToRecipeDataUsingMetaScraper(url: string): Promise<Recipe | null> {
+export async function scrapeUrlMeta(url: string): Promise<Recipe | null> {
     console.log('Parsing URL using Meta Scraper:', url);
     try {
         const html = await fetchHtml(url);

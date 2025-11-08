@@ -1,7 +1,7 @@
 import recipeScraper from 'recipe-scraper';
 import { Recipe } from '@/data/recipes';
 
-export async function parseUrlToRecipeDataUsingRecipeScraper(url: string): Promise<Recipe | null> {
+export async function scrapeUrlRecipescraper(url: string): Promise<Recipe | null> {
     console.log('Parsing URL using Recipe Scraper:', url);
     try {
         const recipe = await recipeScraper(url);

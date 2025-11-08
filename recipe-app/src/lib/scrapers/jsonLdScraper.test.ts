@@ -1,4 +1,4 @@
-import { parseUrlToRecipeDataUsingJsonLdScraper } from '@/lib/scrapers/jsonLdScraper';
+import { scrapeUrlJsonLd } from '@/lib/scrapers/jsonLdScraper';
 import { allrecipesRecipe, bbcGoodFoodRecipe } from '@/lib/utils/testFixtures';
 
 jest.mock('@/lib/utils/fetchHtml', () => ({
@@ -22,7 +22,7 @@ const invalidRecipeUrl = 'https://www.google.com';
 
 describe('jsonLdScraper', () => {
     it('should parse the recipe data from the recipe url', async () => {
-        const recipe = await parseUrlToRecipeDataUsingJsonLdScraper(validRecipeUrl);
+        const recipe = await scrapeUrlJsonLd(validRecipeUrl);
         expect(recipe).toEqual({
             id: expect.any(String),
             title: expect.any(String),
@@ -40,12 +40,12 @@ describe('jsonLdScraper', () => {
     });
 
     it('should return null if the url is not a valid recipe url', async () => {
-        const recipe = await parseUrlToRecipeDataUsingJsonLdScraper(invalidRecipeUrl);
+        const recipe = await scrapeUrlJsonLd(invalidRecipeUrl);
         expect(recipe).toBeNull();
     });
 
     it('should parse the recipe data from the BBC Good Food url', async () => {
-        const recipe = await parseUrlToRecipeDataUsingJsonLdScraper(validBBCGoodFoodRecipeUrl);
+        const recipe = await scrapeUrlJsonLd(validBBCGoodFoodRecipeUrl);
         expect(recipe).toEqual({
             id: expect.any(String),
             title: expect.any(String),

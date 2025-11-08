@@ -1,30 +1,19 @@
 import { createRecipe, Recipe } from "@/lib/database";
 import { NextRequest, NextResponse } from "next/server";
 import { ensureDatabaseInitialized } from "@/lib/server-init";
-import { parseUrlToRecipeDataUsingRecipeScraper } from "@/lib/scrapers/recipeScraper";
-import { parseUrlToRecipeDataUsingJsonLdScraper } from "@/lib/scrapers/jsonLdScraper";
-import { parseUrlToRecipeDataUsingMetaScraper } from "@/lib/scrapers/metaScraper";
+import { normalizeUrl, parseUrl } from "@/lib/parsers/urlParser";
 
 async function parseRecipe(url: string): Promise<Recipe | null> {
-    console.log(url);
-    // TODO: Add validation for the URL (Valid URL and also allowed domains for recipeScraper), not sure if still supported
-    const recipe = await parseUrlToRecipeDataUsingRecipeScraper(url);
-    if (recipe !== null) {
-        console.log(recipe);
-        return recipe;
-    }
+    const normalizedUrl = normalizeUrl(url);
+    const strategy = parseUrl(normalizedUrl);
     
-    console.log('Recipe scraper returned null, falling back to JSON-LD scraper');
-    const recipeJsonLd = await parseUrlToRecipeDataUsingJsonLdScraper(url);
-    if (recipeJsonLd !== null) {
-        console.log(recipeJsonLd);
-        return recipeJsonLd;
-    }
-
-    const recipeMeta = await parseUrlToRecipeDataUsingMetaScraper(url);
-    if (recipeMeta !== null) {
-        console.log(recipeMeta);
-        return recipeMeta;
+    if (strategy) {
+        for (const scraper of strategy.scrapers) {
+            const recipe = await scraper(normalizedUrl);
+            if (recipe !== null) {
+                return recipe;
+            }
+        }
     }
 
     console.log('No recipe found');
@@ -56,7 +45,7 @@ export async function POST(request: NextRequest) {
             instructions: parsedRecipe?.instructions || [],
             image: parsedRecipe?.image || ''
         });
-        
+
 
         return NextResponse.json({
             success: true,
