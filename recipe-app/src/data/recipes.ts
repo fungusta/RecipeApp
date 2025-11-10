@@ -17,6 +17,55 @@ export interface Recipe {
   instructions: Instruction[];
 }
 
+export const RECIPE_TEXT_FORMAT = {
+  type: "json_schema",
+  name: "recipe_response",
+  schema: {
+    type: "object",
+    properties: {
+      recipe: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            description: { type: "string" },
+            instructions: { 
+              type: "array", 
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  description: { type: "string" },
+                  // time: { type: "string" },
+                },
+                required: ["title", "description"],
+                additionalProperties: false
+              }
+            },
+            ingredients: { 
+              type: "array", 
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                },
+                required: ["name"],
+                additionalProperties: false
+              }
+            },
+          },
+          required: ["title", "description", "ingredients", "instructions"],
+          additionalProperties: false
+        }
+      },
+    },
+    required: ["recipe"],
+    additionalProperties: false
+  },
+  strict: true,
+} as const;
+
 export const myRecipes: Recipe[] = [
   {
     id: '1',

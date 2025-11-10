@@ -72,7 +72,7 @@ export async function initializeDatabase() {
         category VARCHAR(100),
         ingredients JSON,
         instructions JSON,
-        image VARCHAR(500),
+        image TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )

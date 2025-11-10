@@ -1,6 +1,6 @@
-import { scrapeUrlJsonLd } from "../scrapers/jsonLdScraper";
-import { scrapeUrlMeta } from "../scrapers/metaScraper";
-import { scrapeUrlRecipescraper } from "../scrapers/recipeScraper";
+import { scrapeRecipeFromJsonLd } from "../scrapers/jsonLdScraper";
+import { scrapeRecipeFromMetaTags } from "../scrapers/metaScraper";
+import { scrapeRecipeWithLibrary } from "../scrapers/recipeScraper";
 import { Recipe } from "@/data/recipes";
 
 // Type for scraper functions - all scrapers have the same signature
@@ -20,7 +20,7 @@ export function parseUrl(url: string): ScraperStrategy | null {
             return {
                 scrapers: [
                     // scrapeUrlInstagramScraper,
-                    scrapeUrlMeta,
+                    scrapeRecipeFromMetaTags,
                 ],
                 needsExtraction: true  // Might need to extract recipe link from post
             };
@@ -28,16 +28,16 @@ export function parseUrl(url: string): ScraperStrategy | null {
             return {
                 scrapers: [
                     // scrapeUrlTiktokScraper,
-                    scrapeUrlMeta,
+                    scrapeRecipeFromMetaTags,
                 ],
                 needsExtraction: true  // Might need to extract recipe link from post
             };
         } else {
             return {
                 scrapers: [
-                    scrapeUrlRecipescraper,
-                    scrapeUrlJsonLd,
-                    scrapeUrlMeta,
+                    scrapeRecipeWithLibrary,
+                    scrapeRecipeFromJsonLd,
+                    scrapeRecipeFromMetaTags,
                 ],
             }
         }
@@ -121,5 +121,14 @@ function getDomainFromUrl(url: string): string {
         return hostname.replace(/^www\./, ""); // remove 'www.' if present
     } catch {
         return "";
+    }
+}
+
+export function isInstagramURL(url: string): boolean {
+    try {
+        const { hostname } = new URL(url);
+        return hostname.includes('instagram.com');
+    } catch {
+        return false;
     }
 }

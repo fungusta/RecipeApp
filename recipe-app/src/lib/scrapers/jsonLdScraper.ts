@@ -11,7 +11,7 @@ import { fetchHtml, FetchError } from '@/lib/utils/fetchHtml';
  * @param url - The URL of the recipe page to scrape
  * @returns Scraped Recipe object, or null if scraping fails
  */
-export async function scrapeUrlJsonLd(url: string): Promise<Recipe | null> {
+export async function scrapeRecipeFromJsonLd(url: string): Promise<Recipe | null> {
     console.log('Scraping URL using JSON-LD Scraper:', url);
     const $ = await getCheerioFromUrl(url);
     if (!$) {
