@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import Modal, { ConfirmModal, LoadingModal } from "@/components/Modal";
 import { Recipe } from "@/data/recipes";
 
+const creatorId = "placeholder";
 
 export default function MyRecipesPage() {
     const router = useRouter();
@@ -28,11 +29,16 @@ export default function MyRecipesPage() {
     async function fetchRecipes() {
         setLoadingRecipes(true);
         try {
-            const response = await fetch('/api/recipes/', {
+            const url = new URL('/api/recipes', window.location.origin);
+            if (creatorId) {
+                url.searchParams.set('creatorId', creatorId);
+            }
+
+            const response = await fetch(url.toString(), {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
             });
             const data = await response.json();
             setRecipes(data.data || []);

@@ -11,7 +11,7 @@ import customRules from "../utils/customRules";
 
 export async function scrapeRecipeFromMetaTags(url: string): Promise<Recipe | null> {
     console.log('[Meta Scraper] Starting scrape for URL:', url);
-    
+
     if (isInstagramURL(url)) {
         console.log('[Meta Scraper] ✓ Detected Instagram URL, routing to Instagram parser');
         return scrapeInstagramMetaTags(url);
@@ -47,7 +47,7 @@ async function scrapeInstagramMetaTags(url: string): Promise<Recipe | null> {
         const caption = meta.title || meta.description;
         console.log('[Instagram Parser] Using caption source:', meta.title ? 'title' : 'description');
         console.log('[Instagram Parser] Caption length:', caption?.length || 0);
-        
+
         if (!caption) {
             console.warn('[Instagram Parser] ⚠️ No caption found in meta tags');
             return null;
@@ -131,7 +131,7 @@ async function scrapeRegularMetaTags(url: string): Promise<Recipe | null> {
 
 async function extractRecipeFromInstagramCaption(caption?: string): Promise<Recipe | null> {
     console.log('[Caption Parser] Starting recipe extraction from caption');
-    
+
     if (!caption) {
         console.warn('[Caption Parser] ⚠️ No caption provided');
         return null;
@@ -170,8 +170,8 @@ async function extractRecipeFromInstagramCaption(caption?: string): Promise<Reci
         });
 
         // Extract first recipe from array (based on your schema)
-        const recipe = Array.isArray(parsed.recipe) && parsed.recipe.length > 0 
-            ? parsed.recipe[0] 
+        const recipe = Array.isArray(parsed.recipe) && parsed.recipe.length > 0
+            ? parsed.recipe[0]
             : parsed.recipe;
 
         if (!recipe) {
@@ -197,18 +197,32 @@ async function extractRecipeFromInstagramCaption(caption?: string): Promise<Reci
 
 function craftOpenAIPrompt(caption: string): string {
     const prompt = `
-    Extract a structured recipe from the following text. 
-    The output must strictly follow the provided JSON schema.
+        Extract a structured recipe from the following text. 
+        The output must strictly follow the provided JSON schema.
+        
+        Input:
+        ${caption}
+        
+        Guidelines:
+        - Infer a clear, descriptive title and a short, engaging description of the dish.
+        - Extract all ingredients mentioned.
+        - Each ingredient should include its quantity and unit if available.
+        - Include short notes (e.g. “smoked”, “optional”, “cut into cubes”) only if relevant.
+        - Break the preparation process into **clear, numbered steps**.
+        - Each step should describe one main action but may include brief clarifiers such as tools, times, or sensory cues.
+        - Avoid merging multiple unrelated actions in a single step.
+        - Avoid unnecessary storytelling or commentary, but do not oversimplify to the point that context is lost.
+        - Example: Instead of "Mix spices, coat salmon, and bake", write separate but informative steps like:
+            1. "Combine all spices in a small bowl to make the Cajun mix."
+            2. "Coat the salmon cubes evenly with the spice mix."
+            3. "Bake for 12 minutes at 240°C (460°F) until golden and flaky."
+        - When specifying temperatures, always include **both Celsius and Fahrenheit** formats in parentheses, e.g. “Bake at 180°C (350°F)” or “Chill at 4°C (39°F)”.
+        - Write the recipe as if for a home cook — friendly, practical, and clear.
+        - Output must be valid JSON following the schema exactly — no extra text outside JSON.
+        `;
     
-    Input:
-    ${caption}
-    
-    Make sure to:
-    - Infer a reasonable title and description.
-    - Include all mentioned ingredients.
-    - Break the preparation steps into clear instructions.
-    `;
-    
+
+
     console.log('[Prompt Crafting] Created prompt for caption');
     return prompt;
 }

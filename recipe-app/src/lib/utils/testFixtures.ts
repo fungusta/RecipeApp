@@ -72,3 +72,4 @@ export const bbcGoodFoodRecipe = `
 </html>
 `;
 
+export const testInstagramReelUrl = "https://www.instagram.com/reel/DQkznxijbwV/"

@@ -37,7 +37,7 @@ export default async function RecipePage({ params }: PageProps) {
 
     return (
         <div className="flex flex-col items-center justify-center p-4 gap-4 py-8">
-            <Card className="w-full max-w-4xl" backgroundColor="bg-orange-400">
+            <Card className="w-full max-w-4xl" backgroundColor="bg-orange-350">
                 <div className="flex flex-col items-center mb-4">
                     {parsedRecipe.image && (
                         <img

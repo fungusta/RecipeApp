@@ -50,9 +50,9 @@ export default function CookingSection({ instructions }: CookingSectionProps) {
               backgroundColor={
                 isCompleted 
                   ? "bg-gray-300" 
-                  : isCurrentStep 
-                    ? "bg-orange-400" 
-                    : "bg-lime-300"
+                  : !isCurrentStep 
+                    ? "bg-lime-300" 
+                    : ""
               }
               className={`relative transition-all duration-300 ${
                 isCompleted ? 'opacity-50' : 'opacity-100'
