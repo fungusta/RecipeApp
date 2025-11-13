@@ -533,3 +533,39 @@ function extractHtmlInstructions($: cheerio.CheerioAPI): Instruction[] {
     return instructions;
 }
 
+function craftOpenAIPrompt(recipe: Recipe): string {
+    const recipeJson = JSON.stringify(recipe, null, 2);
+    
+    const prompt = `
+        Rewrite and format the following recipe object according to the guidelines below.
+        The output must strictly follow the provided JSON schema.
+        
+        Input Recipe:
+        ${recipeJson}
+        
+        Guidelines:
+        - Maintain the core recipe information but improve clarity and formatting.
+        - Ensure the title is clear, descriptive, and properly capitalized.
+        - Write a short, engaging description that captures the essence of the dish.
+        - Format ingredients clearly with quantities and units when available.
+        - Include relevant preparation notes (e.g., "chopped", "optional", "at room temperature") when they add value.
+        - Break instructions into clear, numbered steps.
+        - Each step should describe one main action but may include brief clarifiers such as tools, times, or sensory cues.
+        - Avoid merging multiple unrelated actions in a single step.
+        - Avoid unnecessary storytelling or commentary, but maintain helpful context.
+        - Example: Instead of "Mix spices, coat salmon, and bake", write separate but informative steps like:
+            1. "Combine all spices in a small bowl to make the Cajun mix."
+            2. "Coat the salmon cubes evenly with the spice mix."
+            3. "Bake for 12 minutes at 240°C (460°F) until golden and flaky."
+        - When specifying temperatures, always include **both Celsius and Fahrenheit** formats in parentheses, e.g. "Bake at 180°C (350°F)" or "Chill at 4°C (39°F)".
+        - Standardize ingredient names (e.g., use consistent terminology).
+        - Ensure instructions are in logical order and flow naturally.
+        - Write the recipe as if for a home cook — friendly, practical, and clear.
+        - Preserve all essential information from the input recipe.
+        - Output must be valid JSON following the schema exactly — no extra text outside JSON.
+        `;
+    
+    console.log('[Prompt Crafting] Created prompt for recipe object');
+    return prompt;
+}
+

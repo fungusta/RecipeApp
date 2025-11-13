@@ -5,7 +5,7 @@ import { normalizeUrl, parseUrl } from "@/lib/parsers/urlParser";
 
 async function parseRecipe(url: string): Promise<Recipe | null> {
     const normalizedUrl = normalizeUrl(url);
-    const strategy = parseUrl(normalizedUrl);
+    const strategy = await parseUrl(normalizedUrl);
     
     if (strategy) {
         for (const scraper of strategy.scrapers) {

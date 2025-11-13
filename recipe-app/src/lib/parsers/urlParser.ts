@@ -1,3 +1,4 @@
+import got from "got";
 import { scrapeRecipeFromJsonLd } from "../scrapers/jsonLdScraper";
 import { scrapeRecipeFromMetaTags } from "../scrapers/metaScraper";
 import { scrapeRecipeWithLibrary } from "../scrapers/recipeScraper";
@@ -9,11 +10,21 @@ type ScraperFunction = (url: string) => Promise<Recipe | null>;
 // Type for the return value of parseUrl
 export interface ScraperStrategy {
     scrapers: ScraperFunction[];
-    needsExtraction?: boolean;  // Optional flag for social media URLs
 }
 
-export function parseUrl(url: string): ScraperStrategy | null {
+export async function parseUrl(url: string): Promise<ScraperStrategy | null> {
     const domain = getDomainFromUrl(url);
+
+    if (!domain) {
+        console.error(`[Parser] Invalid or non-website URL: ${url}`);
+        return null;
+    }
+
+    const isAccessible = await canFetchHTML(url);
+    if (!isAccessible) {
+        console.error(`[Parser] HTML Unable to be accessed: ${url}`);
+        return null;
+    }
 
     try {
         if (domain.includes('instagram.com')) {
@@ -22,15 +33,12 @@ export function parseUrl(url: string): ScraperStrategy | null {
                     // scrapeUrlInstagramScraper,
                     scrapeRecipeFromMetaTags,
                 ],
-                needsExtraction: true  // Might need to extract recipe link from post
             };
         } else if (domain.includes('tiktok.com')) {
             return {
                 scrapers: [
-                    // scrapeUrlTiktokScraper,
                     scrapeRecipeFromMetaTags,
                 ],
-                needsExtraction: true  // Might need to extract recipe link from post
             };
         } else {
             return {
@@ -66,11 +74,6 @@ export function normalizeUrl(url: string): string {
         
         if (!normalized) {
             return url; // Return original if empty after trim
-        }
-
-        // 2. Add protocol if missing (default to https)
-        if (!normalized.match(/^https?:\/\//i)) {
-            normalized = `https://${normalized}`;
         }
 
         // 3. Parse the URL
@@ -115,12 +118,27 @@ export function normalizeUrl(url: string): string {
     }
 }
 
-function getDomainFromUrl(url: string): string {
+function getDomainFromUrl(url: string): string | null {
     try {
-        const { hostname } = new URL(url);
+        const urlObj = new URL(url);
+        // Only allow HTTP/HTTPS protocols
+        if (!['http:', 'https:'].includes(urlObj.protocol)) {
+            console.error(`[URL Parser] Non-HTTP protocol detected: ${urlObj.protocol} for URL: ${url}`);
+            return null; // Not a website URL
+        }
+        
+        const hostname = urlObj.hostname;
+        
+        // Check for valid domain (not localhost, file paths, etc.)
+        if (!hostname || hostname === 'localhost' || hostname.startsWith('127.') || hostname.startsWith('192.168.')) {
+            console.error(`[URL Parser] Invalid or local domain: ${hostname || 'empty'} for URL: ${url}`);
+            return null; // Not a valid website domain
+        }
+        
         return hostname.replace(/^www\./, ""); // remove 'www.' if present
-    } catch {
-        return "";
+    } catch (error) {
+        console.error(`[URL Parser] Failed to parse URL: ${url}`, error);
+        return null;
     }
 }
 
@@ -129,6 +147,39 @@ export function isInstagramURL(url: string): boolean {
         const { hostname } = new URL(url);
         return hostname.includes('instagram.com');
     } catch {
+        return false;
+    }
+}
+
+async function canFetchHTML(url: string): Promise<boolean> {
+    try  {
+        const response = await got.head(url, {
+            timeout: { request: 2000 }, // 5 second timeout for quick validation
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (compatible; MyScraperBot/1.0)',
+            },
+            followRedirect: true,
+            throwHttpErrors: false, // Don't throw on 4xx/5xx, just return the response
+        });
+
+        return response.statusCode >= 200 && response.statusCode < 400;
+    } catch (headError) {
+       // If HEAD throws, it's a network/DNS error - URL cannot be fetched
+        // Handle DNS errors (ENOTFOUND, EAI_AGAIN), network errors, etc.
+        const errorCode = (headError as any)?.code;
+        
+        // DNS resolution errors mean the URL cannot be fetched
+        if (errorCode === 'ENOTFOUND' || errorCode === 'EAI_AGAIN') {
+            return false;
+        }
+        
+        // Network errors (timeout, connection refused, etc.)
+        if (errorCode === 'ETIMEDOUT' || errorCode === 'ECONNREFUSED' || errorCode === 'ENETUNREACH') {
+            return false;
+        }
+        
+        // For other errors, log and return false
+        console.error(`[URL Validator] Failed to check URL ${url}:`, headError);
         return false;
     }
 }

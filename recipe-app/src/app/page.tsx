@@ -46,6 +46,11 @@ export default function Home() {
         },
         body: JSON.stringify({ url: importUrl })
       });
+      
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      
       const data = await response.json();
       router.push('/recipes/' + data.data.id);
     } catch (error) {
