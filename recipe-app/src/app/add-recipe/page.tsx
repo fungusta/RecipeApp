@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Ingredient, Instruction } from '@/data/recipes';
 import Card from '@/components/Card';
 import CircularButton from '@/components/CircularButton';
 import Modal, { ConfirmModal, LoadingModal } from '@/components/Modal';
+import { isRecipeComplete } from '@/lib/utils/recipe/recipeValidation';
 
 export default function AddRecipePage() {
   const router = useRouter();
@@ -21,6 +22,30 @@ export default function AddRecipePage() {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
+  const [importUrl, setImportUrl] = useState('');
+
+  // Check for incomplete recipe data from sessionStorage on mount
+  useEffect(() => {
+    const incompleteRecipeData = sessionStorage.getItem('incompleteRecipe');
+    if (incompleteRecipeData) {
+      try {
+        const recipeData = JSON.parse(incompleteRecipeData);
+        alert('The imported recipe data was incomplete. Please fill in the missing information.');
+        setFormData({
+          title: recipeData.title || '',
+          description: recipeData.description || '',
+          image: recipeData.image || '',
+          ingredients: recipeData.ingredients || [],
+          instructions: recipeData.instructions || []
+        });
+        setShowCreateRecipe(true);
+        sessionStorage.removeItem('incompleteRecipe');
+      } catch (error) {
+        console.error('Error parsing incomplete recipe data:', error);
+        sessionStorage.removeItem('incompleteRecipe');
+      }
+    }
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -123,15 +148,71 @@ export default function AddRecipePage() {
     setShowImportModal(true);
   };
 
-  const handleImportConfirm = () => {
+  const handleImportConfirm = async () => {
     setShowLoadingModal(true);
-    // Simulate loading
-    setTimeout(() => {
+    try {
+      // Step 1: Parse the recipe (GET request - no side effects)
+      const parseResponse = await fetch(`/api/recipes/parse?url=${encodeURIComponent(importUrl)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!parseResponse.ok) {
+        const errorData = await parseResponse.json();
+        throw new Error(errorData.error || 'Failed to parse recipe');
+      }
+
+      const parseData = await parseResponse.json();
+      const parsedRecipe = parseData.data;
+
+      if (!isRecipeComplete(parsedRecipe)) {
+        setShowCreateRecipe(true);
+        setFormData({
+          title: parsedRecipe.title || '',
+          description: parsedRecipe.description || '',
+          image: parsedRecipe.image || '',
+          ingredients: parsedRecipe.ingredients || [],
+          instructions: parsedRecipe.instructions || []
+        });
+
+        setShowLoadingModal(false);
+        setShowImportModal(false);
+        return;
+      }
+
+      // Step 2: Create the recipe (POST request)
+      const createResponse = await fetch('/api/recipes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: parsedRecipe.title,
+          description: parsedRecipe.description,
+          image: parsedRecipe.image,
+          ingredients: parsedRecipe.ingredients,
+          instructions: parsedRecipe.instructions,
+          recipeUrl: importUrl,
+          creatorId: parsedRecipe.creatorId || 'placeholder'
+        })
+      });
+
+      if (!createResponse.ok) {
+        const errorData = await createResponse.json();
+        throw new Error(errorData.error || 'Failed to create recipe');
+      }
+
+      const createData = await createResponse.json();
+      router.push('/recipes/' + createData.data.id);
+    } catch (error) {
+      console.error('Error importing recipe:', error);
+      alert(error instanceof Error ? error.message : 'Failed to import recipe');
+    } finally {
       setShowLoadingModal(false);
       setShowImportModal(false);
-      // Here you would typically handle the actual import logic
-      console.log('Recipe import completed');
-    }, 2000);
+    }
   };
 
   const isFormValid = () => {
@@ -157,6 +238,13 @@ export default function AddRecipePage() {
                 type="text"
                 placeholder="Paste your recipe link here (Instagram, Tiktok, or website)"
                 className="w-full bg-transparent text-gray-600 placeholder-gray-500 focus:outline-none"
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleImportConfirm();
+                  }
+                }}
               />
             </div>
 

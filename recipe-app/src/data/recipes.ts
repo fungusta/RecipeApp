@@ -10,7 +10,7 @@ export interface Ingredient {
 
 export interface Recipe {
   id: string;
-  image: string;
+  image?: string;
   title: string;
   description: string;
   ingredients: Ingredient[];

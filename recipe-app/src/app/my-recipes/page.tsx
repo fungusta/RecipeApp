@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal, { ConfirmModal, LoadingModal } from "@/components/Modal";
 import { Recipe } from "@/data/recipes";
+import { isRecipeComplete } from "@/lib/utils/recipe/recipeValidation";
 
 const creatorId = "placeholder";
 
@@ -68,17 +69,65 @@ export default function MyRecipesPage() {
     const handleImportConfirm = async () => {
         setShowRecipeImportLoadingModal(true);
         try {
-            const response = await fetch('/api/recipes/parse', {
+            // Step 1: Parse the recipe (GET request - no side effects)
+            const parseResponse = await fetch(`/api/recipes/parse?url=${encodeURIComponent(importUrl)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!parseResponse.ok) {
+                const errorData = await parseResponse.json();
+                throw new Error(errorData.error || 'Failed to parse recipe');
+            }
+
+            const parseData = await parseResponse.json();
+            const parsedRecipe = parseData.data;
+
+            if (!isRecipeComplete(parsedRecipe)) {
+                // Store incomplete recipe data in sessionStorage for autofill
+                const recipeDataToPass = {
+                    title: parsedRecipe.title || '',
+                    description: parsedRecipe.description || '',
+                    image: parsedRecipe.image || '',
+                    ingredients: parsedRecipe.ingredients || [],
+                    instructions: parsedRecipe.instructions || []
+                };
+                sessionStorage.setItem('incompleteRecipe', JSON.stringify(recipeDataToPass));
+                setShowRecipeImportLoadingModal(false);
+                setShowImportModal(false);
+                router.push('/add-recipe');
+                return;
+            }
+
+            // Step 2: Create the recipe (POST request)
+            const createResponse = await fetch('/api/recipes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ url: importUrl })
+                body: JSON.stringify({
+                    title: parsedRecipe.title,
+                    description: parsedRecipe.description,
+                    image: parsedRecipe.image,
+                    ingredients: parsedRecipe.ingredients,
+                    instructions: parsedRecipe.instructions,
+                    recipeUrl: importUrl,
+                    creatorId: parsedRecipe.creatorId || 'placeholder'
+                })
             });
-            const data = await response.json();
-            router.push('/recipes/' + data.data.id);
+
+            if (!createResponse.ok) {
+                const errorData = await createResponse.json();
+                throw new Error(errorData.error || 'Failed to create recipe');
+            }
+
+            const createData = await createResponse.json();
+            router.push('/recipes/' + createData.data.id);
         } catch (error) {
             console.error('Error importing recipe:', error);
+            alert(error instanceof Error ? error.message : 'Failed to import recipe');
         } finally {
             setShowRecipeImportLoadingModal(false);
             setShowImportModal(false);

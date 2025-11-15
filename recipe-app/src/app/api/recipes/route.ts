@@ -95,3 +95,50 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    // Ensure database is initialized
+    await ensureDatabaseInitialized();
+
+    const body = await request.json();
+
+    // Validate required fields
+    if (!body.title || !body.description) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Title and description are required'
+        },
+        { status: 400 }
+      );
+    }
+
+    const createdRecipe = await createRecipe({
+      title: body.title,
+      creatorId: body.creatorId || 'placeholder',
+      recipeUrl: body.recipeUrl || null,
+      description: body.description,
+      ingredients: body.ingredients || [],
+      instructions: body.instructions || [],
+      image: body.image || null,
+      category: body.category || null
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: createdRecipe,
+      message: 'Recipe created successfully'
+    });
+  } catch (error) {
+    console.error('Error in POST /api/recipes:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to create recipe',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
+  }
+}

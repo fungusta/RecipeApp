@@ -1,7 +1,7 @@
 import { Ingredient, Instruction, Recipe } from '@/data/recipes';
 import * as cheerio from 'cheerio';
 import sanitizeHtml from 'sanitize-html';
-import { filterRecipeData } from '@/lib/utils/filterRecipeData';
+import { filterRecipeData } from '@/lib/utils/recipe/filterRecipeData';
 import { fetchHtml, FetchError } from '@/lib/utils/fetchHtml';
 
 /**

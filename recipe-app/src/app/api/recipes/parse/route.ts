@@ -20,14 +20,19 @@ async function parseRecipe(url: string): Promise<Recipe | null> {
     return null;
 }
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
     try {
-        // Ensure database is initialized before attempting to create a recipe
-        await ensureDatabaseInitialized();
+        const { searchParams } = new URL(request.url);
+        const url = searchParams.get('url');
+        
+        if (!url) {
+            return NextResponse.json({
+                success: false,
+                error: 'URL parameter is required'
+            }, { status: 400 });
+        }
 
-        const body = await request.json();
-
-        const parsedRecipe = await parseRecipe(body.url);
+        const parsedRecipe = await parseRecipe(url);
 
         if (parsedRecipe === null) {
             return NextResponse.json({
@@ -36,24 +41,13 @@ export async function POST(request: NextRequest) {
             }, { status: 404 });
         }
 
-        const createdRecipe = await createRecipe({
-            title: parsedRecipe?.title || '',
-            creatorId: parsedRecipe?.creatorId || 'placeholder',
-            recipeUrl: body.url || '',
-            description: parsedRecipe?.description || '',
-            ingredients: parsedRecipe?.ingredients || [],
-            instructions: parsedRecipe?.instructions || [],
-            image: parsedRecipe?.image || ''
-        });
-
-
         return NextResponse.json({
             success: true,
-            data: createdRecipe,
+            data: parsedRecipe,
             message: 'Recipe parsed successfully'
         });
     } catch (error) {
-        console.error('Error in POST /api/recipes/parse:', error);
+        console.error('Error in GET /api/recipes/parse:', error);
         return NextResponse.json(
             {
                 success: false,
