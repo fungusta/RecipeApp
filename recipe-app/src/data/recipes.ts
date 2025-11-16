@@ -17,6 +17,36 @@ export interface Recipe {
   instructions: Instruction[];
 }
 
+/**
+ * Removes description from instructions where the description matches the title.
+ * Compares titles and descriptions in a case-insensitive, trimmed manner.
+ * 
+ * @param instructions - Array of instructions to process
+ * @returns Array of instructions with duplicate descriptions removed
+ */
+export function removeDuplicateInstructionDescriptions(instructions: Instruction[]): Instruction[] {
+  if (!Array.isArray(instructions)) {
+    return instructions;
+  }
+
+  return instructions.map((instruction) => {
+    if (instruction.title && instruction.description) {
+      // Normalize both strings for comparison (trim and case-insensitive)
+      const normalizedTitle = instruction.title.trim().toLowerCase();
+      const normalizedDescription = instruction.description.trim().toLowerCase();
+      
+      // If title and description are the same, remove the description
+      if (normalizedTitle === normalizedDescription) {
+        return {
+          ...instruction,
+          description: ''
+        };
+      }
+    }
+    return instruction;
+  });
+}
+
 export const RECIPE_TEXT_FORMAT = {
   type: "json_schema",
   name: "recipe_response",

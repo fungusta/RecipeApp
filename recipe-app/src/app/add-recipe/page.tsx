@@ -168,32 +168,66 @@ export default function AddRecipePage() {
       const parsedRecipe = parseData.data;
 
       if (!isRecipeComplete(parsedRecipe)) {
-        setShowCreateRecipe(true);
-        setFormData({
+        // Store incomplete recipe data in sessionStorage for autofill
+        const recipeDataToPass = {
           title: parsedRecipe.title || '',
           description: parsedRecipe.description || '',
           image: parsedRecipe.image || '',
           ingredients: parsedRecipe.ingredients || [],
           instructions: parsedRecipe.instructions || []
-        });
-
+        };
+        sessionStorage.setItem('incompleteRecipe', JSON.stringify(recipeDataToPass));
         setShowLoadingModal(false);
         setShowImportModal(false);
+        router.push('/add-recipe');
         return;
       }
 
-      // Step 2: Create the recipe (POST request)
+      // Step 2: Try to format the recipe (with fallback to parsedRecipe on error)
+      let recipeToUse = parsedRecipe; // Default to parsed recipe
+
+      try {
+        const formatResponse = await fetch('/api/recipes/format', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: parsedRecipe.title,
+            description: parsedRecipe.description,
+            ingredients: parsedRecipe.ingredients,
+            instructions: parsedRecipe.instructions,
+          })
+        });
+
+        if (formatResponse.ok) {
+          const formatData = await formatResponse.json();
+          if (formatData.success && formatData.data) {
+            recipeToUse = formatData.data;
+            console.log('Recipe formatted successfully');
+          } else {
+            console.warn('Format API returned unsuccessful response, using parsed recipe');
+          }
+        } else {
+          console.warn('Format API failed, falling back to parsed recipe');
+        }
+      } catch (formatError) {
+        // If formatting fails, log the error but continue with parsedRecipe
+        console.warn('Error formatting recipe, using parsed recipe instead:', formatError);
+      }
+
+      // Step 3: Create the recipe using formatted or parsed recipe
       const createResponse = await fetch('/api/recipes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title: parsedRecipe.title,
-          description: parsedRecipe.description,
+          title: recipeToUse.title,
+          description: recipeToUse.description,
           image: parsedRecipe.image,
-          ingredients: parsedRecipe.ingredients,
-          instructions: parsedRecipe.instructions,
+          ingredients: recipeToUse.ingredients,
+          instructions: recipeToUse.instructions,
           recipeUrl: importUrl,
           creatorId: parsedRecipe.creatorId || 'placeholder'
         })
@@ -213,7 +247,7 @@ export default function AddRecipePage() {
       setShowLoadingModal(false);
       setShowImportModal(false);
     }
-  };
+  }
 
   const isFormValid = () => {
     return formData.title.trim() !== '' &&

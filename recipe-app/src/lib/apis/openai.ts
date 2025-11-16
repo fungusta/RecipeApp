@@ -10,7 +10,6 @@ const openai = new OpenAI({
 export async function callOpenAI(
     prompt: string,
     options?: {
-        temperature?: number
         format?: {
             type: 'json_schema'
             name: string
@@ -22,7 +21,6 @@ export async function callOpenAI(
     console.log('[OpenAI API] ========================================');
     console.log('[OpenAI API] Starting OpenAI API call');
     console.log('[OpenAI API] Model:', OPENAI_MODEL);
-    console.log('[OpenAI API] Temperature:', options?.temperature ?? 'default');
     console.log('[OpenAI API] Using JSON schema format:', !!options?.format);
     console.log('[OpenAI API] Prompt length:', prompt.length, 'characters');
 
@@ -30,7 +28,6 @@ export async function callOpenAI(
         const response = await openai.responses.create({
             model: OPENAI_MODEL,
             input: prompt,
-            temperature: options?.temperature,
             text: {
                 format: options?.format
             },

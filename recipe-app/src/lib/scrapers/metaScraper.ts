@@ -105,9 +105,7 @@ async function scrapeRegularMetaTags(url: string): Promise<Recipe | null> {
         ]);
 
         const meta = await metascraperInstance({ html, url });
-        console.log(meta);
 
-        // Parse ingredients and instructions from description
         const ingredients: Ingredient[] = [];
         const instructions: Instruction[] = [];
 
@@ -197,31 +195,32 @@ async function extractRecipeFromInstagramCaption(caption?: string): Promise<Reci
 
 function craftOpenAIPrompt(caption: string): string {
     const prompt = `
-        Extract a structured recipe from the following text. 
-        The output must strictly follow the provided JSON schema.
-        
+        Extract a structured recipe from the following text.
+        Return valid JSON that strictly follows the provided JSON schema.
+
+        If some recipe components (title, ingredients, instructions, description) 
+        are missing from the input, leave those fields EMPTY,
+        but do NOT fabricate or guess missing information.
+
         Input:
         ${caption}
-        
-        Guidelines:
-        - Infer a clear, descriptive title and a short, engaging description of the dish.
-        - Extract all ingredients mentioned.
-        - Each ingredient should include its quantity and unit if available.
-        - Include short notes (e.g. “smoked”, “optional”, “cut into cubes”) only if relevant.
-        - Break the preparation process into **clear, numbered steps**.
-        - Each step should describe one main action but may include brief clarifiers such as tools, times, or sensory cues.
-        - Avoid merging multiple unrelated actions in a single step.
-        - Avoid unnecessary storytelling or commentary, but do not oversimplify to the point that context is lost.
-        - Example: Instead of "Mix spices, coat salmon, and bake", write separate but informative steps like:
-            1. "Combine all spices in a small bowl to make the Cajun mix."
-            2. "Coat the salmon cubes evenly with the spice mix."
-            3. "Bake for 12 minutes at 240°C (460°F) until golden and flaky."
-        - When specifying temperatures, always include **both Celsius and Fahrenheit** formats in parentheses, e.g. “Bake at 180°C (350°F)” or “Chill at 4°C (39°F)”.
-        - Write the recipe as if for a home cook — friendly, practical, and clear.
-        - Output must be valid JSON following the schema exactly — no extra text outside JSON.
-        `;
-    
 
+        Guidelines:
+        - Infer a title ONLY if it can be confidently inferred from the text.
+        - Infer a description ONLY if the dish is clearly identifiable.
+        - Extract only ingredients explicitly mentioned in the text.
+        - Extract only steps explicitly stated or clearly implied.
+        - Leave fields as empty strings or empty arrays if the input does not contain enough information.
+        - Never hallucinate quantities, units, cooking times, or steps.
+        - Output must be valid JSON only, matching the schema exactly.
+
+        Examples of allowed behavior:
+        - Title available but no ingredients → return title + empty ingredients array.
+        - Ingredients available but no steps → return ingredients + empty steps array.
+        - Text only mentions "chicken marinade" without details → title = "Chicken Marinade", everything else empty.
+
+        Do not output anything except valid JSON.
+        `;
 
     console.log('[Prompt Crafting] Created prompt for caption');
     return prompt;
