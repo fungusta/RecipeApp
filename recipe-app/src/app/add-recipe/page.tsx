@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Ingredient, Instruction } from '@/data/recipes';
 import Card from '@/components/Card';
@@ -23,6 +23,8 @@ export default function AddRecipePage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [importUrl, setImportUrl] = useState('');
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Check for incomplete recipe data from sessionStorage on mount
   useEffect(() => {
@@ -142,6 +144,47 @@ export default function AddRecipePage() {
 
   const handleAddImage = () => {
     console.log('Adding image');
+    // Open File Picker
+    fileInputRef.current?.click();
+    // Send File to Backend
+    
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      // Create FormData to send the file
+      const formData = new FormData();
+      formData.append('image', file);
+
+      // Send file to backend
+      const response = await fetch('/api/recipes/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.url) {
+        // Update formData with the uploaded image URL
+        setFormData(prev => ({
+          ...prev,
+          image: result.url
+        }));
+      } else {
+        alert(result.error || 'Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      // Reset the input so the same file can be selected again if needed
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const handleRecipeImport = () => {
@@ -402,6 +445,14 @@ export default function AddRecipePage() {
                   </CircularButton>
                 )}
               </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
 
               <div className="w-full max-w-md space-y-4">
                 <div>
