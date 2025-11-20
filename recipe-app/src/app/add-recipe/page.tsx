@@ -390,7 +390,16 @@ export default function AddRecipePage() {
                     className="w-full h-full object-cover rounded-lg"
                   />
                 ) : (
-                  <button onClick={handleAddImage} className="text-gray-400 text-4xl" >+</button>
+                  <CircularButton
+                    onClick={handleAddImage}
+                    variant="secondary"
+                    size="lg"
+                    title="Add Image"
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </CircularButton>
                 )}
               </div>
 
@@ -432,21 +441,22 @@ export default function AddRecipePage() {
               <h2 className="text-xl font-bold text-center">
                 Ingredients <span className="text-red-500">*</span>
               </h2>
-              <button
+              <CircularButton
                 onClick={addIngredient}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2"
+                variant="secondary"
+                size="md"
+                title="Add Ingredient"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Add Ingredient
-              </button>
+              </CircularButton>
             </div>
 
             {formData.ingredients.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <div className="text-4xl mb-2">🥘</div>
-                <p>No ingredients added yet. Click "Add Ingredient" to get started!</p>
+                <p>No ingredients added yet. Click the + icon to get started!</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -465,12 +475,16 @@ export default function AddRecipePage() {
                       </div>
 
                       <div className="flex justify-end">
-                        <button
+                        <CircularButton
                           onClick={() => removeIngredient(index)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition-colors duration-200"
+                          variant="danger"
+                          size="sm"
+                          title="Remove Ingredient"
                         >
-                          Remove
-                        </button>
+                          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </CircularButton>
                       </div>
                     </div>
                   </div>
@@ -480,29 +494,29 @@ export default function AddRecipePage() {
           </Card>
 
           {/* Instructions Section */}
-          <div className="w-full max-w-4xl">
+          <Card className="w-full max-w-4xl" backgroundColor="bg-lime-300">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
                 Cooking Instructions <span className="text-red-500">*</span>
               </h2>
-              <button
+              <CircularButton
                 onClick={addInstruction}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors duration-200 flex items-center gap-2"
+                variant="secondary"
+                size="md"
+                title="Add Step"
+                className="!bg-lime-300 hover:!bg-lime-400 text-gray-800"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Add Step
-              </button>
+              </CircularButton>
             </div>
 
             {formData.instructions.length === 0 ? (
-              <Card className="bg-lime-300">
-                <div className="text-center py-8 text-gray-600">
-                  <div className="text-4xl mb-2">👨‍🍳</div>
-                  <p>No cooking steps added yet. Click "Add Step" to get started!</p>
-                </div>
-              </Card>
+              <div className="text-center py-8 text-gray-600">
+                <div className="text-4xl mb-2">👨‍🍳</div>
+                <p>No cooking steps added yet. Click the + icon to get started!</p>
+              </div>
             ) : (
               <div className="space-y-4">
                 {formData.instructions.map((instruction, index) => (
@@ -514,12 +528,16 @@ export default function AddRecipePage() {
                     <div className="space-y-4">
                       <div className="flex justify-between items-start">
                         <h3 className="text-lg font-bold text-gray-900">Step {index + 1}</h3>
-                        <button
+                        <CircularButton
                           onClick={() => removeInstruction(index)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition-colors duration-200 text-sm"
+                          variant="danger"
+                          size="sm"
+                          title="Remove Step"
                         >
-                          Remove
-                        </button>
+                          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </CircularButton>
                       </div>
 
                       <div>
@@ -559,27 +577,32 @@ export default function AddRecipePage() {
                 ))}
               </div>
             )}
-          </div>
+          </Card>
 
           {/* Action Buttons */}
           <Card className="w-full max-w-4xl">
-            <div className="flex justify-center gap-4">
-              <button
+            <div className="flex justify-center gap-4 items-center">
+              <CircularButton
                 onClick={handleCancel}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md transition-colors duration-200"
+                variant="gray"
+                size="md"
+                title="Cancel"
               >
-                Cancel
-              </button>
-              <button
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </CircularButton>
+              <CircularButton
                 onClick={handleSave}
                 disabled={!isFormValid()}
-                className={`px-6 py-3 rounded-md transition-colors duration-200 ${isFormValid()
-                  ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
+                variant={isFormValid() ? "primary" : "gray"}
+                size="md"
+                title={isFormValid() ? "Create Recipe" : "Fill all required fields"}
               >
-                Create Recipe
-              </button>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </CircularButton>
             </div>
 
             {!isFormValid() && (

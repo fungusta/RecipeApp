@@ -36,8 +36,8 @@ export default function CookingSection({ instructions }: CookingSectionProps) {
   const currentStepIndex = getCurrentStepIndex();
 
   return (
-    <div className="w-full max-w-4xl">
-      <h2 className="text-2xl font-bold text-center mb-6 text-gray-900">Cooking</h2>
+    <Card className="w-full max-w-4xl" backgroundColor="bg-lime-300">
+      <h2 className="text-2xl font-bold text-center mb-6 text-gray-900">Cooking Instructions</h2>
       
       <div className="space-y-4">
         {instructions.map((instruction, index) => {
@@ -50,9 +50,9 @@ export default function CookingSection({ instructions }: CookingSectionProps) {
               backgroundColor={
                 isCompleted 
                   ? "bg-gray-300" 
-                  : !isCurrentStep 
-                    ? "bg-lime-300" 
-                    : ""
+                  : isCurrentStep 
+                    ? "bg-orange-300" 
+                    : "bg-lime-300"
               }
               className={`relative transition-all duration-300 ${
                 isCompleted ? 'opacity-50' : 'opacity-100'
@@ -94,6 +94,6 @@ export default function CookingSection({ instructions }: CookingSectionProps) {
           );
         })}
       </div>
-    </div>
+    </Card>
   );
 }

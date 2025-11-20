@@ -22,9 +22,6 @@ const config: Config = {
           800: '#B38236',
           900: '#996F2F',
         },
-        orange: {
-          400: '#FBBB4B', // Override the default orange-400 with your color
-        }
       },
     },
   },

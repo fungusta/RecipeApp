@@ -2,6 +2,7 @@ import Card from '@/components/Card';
 import IngredientsSection from '@/components/IngredientsSection';
 import CookingSection from '@/components/CookingSection';
 import { getRecipeById } from '@/lib/database';
+import EditButton from '@/components/EditButton';
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -39,6 +40,9 @@ export default async function RecipePage({ params }: PageProps) {
         <div className="flex flex-col items-center justify-center p-4 gap-4 py-8">
             <Card className="w-full max-w-4xl" backgroundColor="bg-orange-350">
                 <div className="flex flex-col items-center mb-4">
+                    <div className="flex items-center justify-end w-full mb-4">
+                        <EditButton href={`/recipes/${recipeId}/edit`} />
+                    </div>
                     {parsedRecipe.image && (
                         <img
                             src={parsedRecipe.image}
@@ -54,10 +58,6 @@ export default async function RecipePage({ params }: PageProps) {
             <IngredientsSection ingredients={parsedRecipe.ingredients} />
             
             <CookingSection instructions={parsedRecipe.instructions} />
-            
-            <Card className="w-full max-w-4xl">
-                <p className="text-gray-500 text-center">More recipe content will be added here...</p>
-            </Card>
         </div>
     );
 }
