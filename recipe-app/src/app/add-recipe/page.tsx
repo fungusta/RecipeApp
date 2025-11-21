@@ -23,6 +23,7 @@ export default function AddRecipePage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [importUrl, setImportUrl] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -105,6 +106,35 @@ export default function AddRecipePage() {
   const handleSave = async () => {
     console.log('Creating new recipe:', formData);
 
+    let finalImageUrl = formData.image;
+
+    try {
+      // Create FormData to send the file
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+
+        const response = await fetch('/api/recipes/image', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.url) {
+          finalImageUrl = result.url;
+        } else {
+          throw new Error(result.error || 'Failed to upload image');
+        }
+      }
+
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image. Please try again.');
+      setShowLoadingModal(false); 
+      return; 
+    }
+
     try {
       const response = await fetch('/api/recipes', {
         method: 'POST',
@@ -114,7 +144,7 @@ export default function AddRecipePage() {
         body: JSON.stringify({
           title: formData.title,
           description: formData.description,
-          image: formData.image,
+          image: finalImageUrl,
           ingredients: formData.ingredients,
           instructions: formData.instructions
         })
@@ -146,44 +176,22 @@ export default function AddRecipePage() {
     console.log('Adding image');
     // Open File Picker
     fileInputRef.current?.click();
-    // Send File to Backend
-    
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    try {
-      // Create FormData to send the file
-      const formData = new FormData();
-      formData.append('image', file);
+    setImageFile(file);
 
-      // Send file to backend
-      const response = await fetch('/api/recipes/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
+    const previewUrl = URL.createObjectURL(file);
+    setFormData(prev => ({
+      ...prev,
+      image: previewUrl
+    }));
 
-      const result = await response.json();
-
-      if (result.success && result.url) {
-        // Update formData with the uploaded image URL
-        setFormData(prev => ({
-          ...prev,
-          image: result.url
-        }));
-      } else {
-        alert(result.error || 'Failed to upload image');
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Failed to upload image. Please try again.');
-    } finally {
-      // Reset the input so the same file can be selected again if needed
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -425,18 +433,33 @@ export default function AddRecipePage() {
             <div className="flex flex-col items-center mb-4">
               <h1 className="text-2xl font-bold text-gray-800 mb-4">Create New Recipe</h1>
 
-              <div className="w-32 h-32 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
+              <div className="w-32 h-32 bg-gray-200 rounded-lg mb-4 flex items-center justify-center relative group">
                 {formData.image ? (
-                  <img
-                    src={formData.image}
-                    alt={formData.title || 'Recipe'}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
+                  <>
+                    <img
+                      src={formData.image}
+                      alt={formData.title || 'Recipe'}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center transition-all duration-200 rounded-lg">
+                      <CircularButton
+                        onClick={handleAddImage}
+                        variant="secondary"
+                        size="sm"
+                        title="Change Image"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 transform scale-90 group-hover:scale-100 shadow-lg"
+                      >
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </CircularButton>
+                    </div>
+                  </>
                 ) : (
                   <CircularButton
                     onClick={handleAddImage}
                     variant="secondary"
-                    size="lg"
+                    size="sm"
                     title="Add Image"
                   >
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">

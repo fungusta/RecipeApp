@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { LoadingModal } from '@/components/Modal';
 import Card from '@/components/Card';
@@ -16,6 +16,9 @@ export default function EditRecipeForm({ initialRecipe, recipeId}: EditRecipeFor
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    
     const [formData, setFormData] = useState({
         title: initialRecipe.title || '',
         description: initialRecipe.description || '',
@@ -81,7 +84,28 @@ export default function EditRecipeForm({ initialRecipe, recipeId}: EditRecipeFor
         setIsSaving(true);
         setSaveError(null);
 
+        let finalImageUrl = formData.image;
+
         try {
+            // Step 1: Upload image if a new file was selected
+            if (imageFile) {
+                const uploadFormData = new FormData();
+                uploadFormData.append('image', imageFile);
+
+                const uploadResponse = await fetch('/api/recipes/image', {
+                    method: 'POST',
+                    body: uploadFormData,
+                });
+
+                const uploadResult = await uploadResponse.json();
+
+                if (uploadResult.success && uploadResult.url) {
+                    finalImageUrl = uploadResult.url;
+                } else {
+                    throw new Error(uploadResult.error || 'Failed to upload image');
+                }
+            }
+
             const response = await fetch(`/api/recipes/${recipeId}`, {
                 method: 'PUT',
                 headers: {
@@ -90,7 +114,7 @@ export default function EditRecipeForm({ initialRecipe, recipeId}: EditRecipeFor
                 body: JSON.stringify({
                     title: formData.title,
                     description: formData.description,
-                    image: formData.image,
+                    image: finalImageUrl,
                     ingredients: formData.ingredients,
                     instructions: formData.instructions
                 })
@@ -116,7 +140,23 @@ export default function EditRecipeForm({ initialRecipe, recipeId}: EditRecipeFor
     };
 
     const handleAddImage = () => {
-        console.log('Adding image');
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setImageFile(file);
+        const previewUrl = URL.createObjectURL(file);
+        setFormData(prev => ({
+            ...prev,
+            image: previewUrl
+        }));
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     const isFormValid = () => {
@@ -166,18 +206,40 @@ export default function EditRecipeForm({ initialRecipe, recipeId}: EditRecipeFor
                 <div className="flex flex-col items-center mb-4">
                     <h1 className="text-2xl font-bold text-gray-800 mb-4">Edit Recipe</h1>
 
-                    <div className="w-32 h-32 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
+                    <div className="w-32 h-32 bg-gray-200 rounded-lg mb-4 flex items-center justify-center relative group">
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleFileChange}
+                        />
                         {formData.image ? (
-                            <img
-                                src={formData.image}
-                                alt={formData.title || 'Recipe'}
-                                className="w-full h-full object-cover rounded-lg"
-                            />
+                            <>
+                                <img
+                                    src={formData.image}
+                                    alt={formData.title || 'Recipe'}
+                                    className="w-full h-full object-cover rounded-lg"
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center transition-all duration-200 rounded-lg">
+                                    <CircularButton
+                                        onClick={handleAddImage}
+                                        variant="secondary"
+                                        size="sm"
+                                        title="Change Image"
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 transform scale-90 group-hover:scale-100 shadow-lg"
+                                    >
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-4 h-4">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                    </CircularButton>
+                                </div>
+                            </>
                         ) : (
                             <CircularButton
                                 onClick={handleAddImage}
                                 variant="secondary"
-                                size="lg"
+                                size="sm"
                                 title="Add Image"
                             >
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
