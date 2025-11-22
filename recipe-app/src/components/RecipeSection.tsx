@@ -17,6 +17,7 @@ interface RecipeSectionProps {
 
 export default function RecipeSection({ header, items, viewMoreLink }: RecipeSectionProps) {
   const router = useRouter();
+  const visibleItems = items.slice(0, 9);
 
   const handleRecipeClick = (recipeId: string) => {
     router.push(`/recipes/${recipeId}`);
@@ -50,7 +51,7 @@ export default function RecipeSection({ header, items, viewMoreLink }: RecipeSec
       </div>
       
       <div className="grid grid-cols-3 gap-3">
-        {items.map((item, index) => (
+        {visibleItems.map((item, index) => (
           <div
             key={item.id || index}
             onClick={() => handleRecipeClick(item.id)}

@@ -23,12 +23,6 @@ export default function Header() {
               Home
             </Link>
             <Link 
-              href="/discover" 
-              className="text-gray-600 hover:text-orange-500 transition-colors duration-200 font-medium"
-            >
-              Discover
-            </Link>
-            <Link 
               href="/my-recipes" 
               className="text-gray-600 hover:text-orange-500 transition-colors duration-200 font-medium"
             >

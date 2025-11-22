@@ -1,25 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import SearchBar from '@/components/SearchBar';
 import RecipeSection from '@/components/RecipeSection';
 import CircularButton from '@/components/CircularButton';
 import ImportRecipesSection from '@/components/ImportRecipesSection';
+import RecipeSkeleton from '@/components/RecipeSkeleton';
 import Modal, { ConfirmModal, LoadingModal } from '@/components/Modal';
-import { myRecipes, discoverRecipes } from '@/data/recipes';
 import { useRouter } from 'next/navigation';
 import { isRecipeComplete } from '@/lib/utils/recipe/recipeValidation';
+
+const creatorId = 'placeholder';
 
 export default function Home() {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState('');
   const [importUrl, setImportUrl] = useState('');
+  const [myRecipes, setMyRecipes] = useState([]);
+  const [loadingRecipes, setLoadingRecipes] = useState(false);
 
   // Modal states
   const [showImportModal, setShowImportModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
+
+  useEffect(() => {
+    fetchRecipes();
+  }, []);
+
+  async function fetchRecipes() {
+    setLoadingRecipes(true);
+    try {
+      const url = new URL('/api/recipes', window.location.origin);
+      if (creatorId) {
+        url.searchParams.set('creatorId', creatorId);
+      }
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      setMyRecipes(data.data || []);
+    } catch (error) {
+      console.error('Error importing recipe:', error);
+    } finally {
+      setLoadingRecipes(false);
+    }
+  }
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
@@ -74,7 +105,7 @@ export default function Home() {
 
       // Step 2: Try to format the recipe (with fallback to parsedRecipe on error)
       let recipeToUse = parsedRecipe; // Default to parsed recipe
-      
+
       try {
         const formatResponse = await fetch('/api/recipes/format', {
           method: 'POST',
@@ -165,8 +196,19 @@ export default function Home() {
         {/* Import Recipes Section */}
         <ImportRecipesSection onImportClick={handleRecipeImport} />
       </Card>
-      <RecipeSection header="My Recipes" items={myRecipes} viewMoreLink="/my-recipes" />
-      <RecipeSection header="Discover" items={discoverRecipes} viewMoreLink="/discover" />
+      {loadingRecipes ? (
+        <RecipeSkeleton count={6} />
+      ) : myRecipes.length === 0 ? (
+        <div className="w-full max-w-xl">
+          <Card className="flex flex-col items-center justify-center p-8">
+            <p className="text-gray-600 text-center">
+              No recipes yet. Start by adding or importing a recipe!
+            </p>
+          </Card>
+        </div>
+      ) : (
+        <RecipeSection header="My Recipes" items={myRecipes} viewMoreLink="/my-recipes" />
+      )}
 
       {/* Modals */}
       <Modal
