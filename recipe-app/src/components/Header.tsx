@@ -1,5 +1,6 @@
 'use client';
 
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 
 export default function Header() {
@@ -14,16 +15,30 @@ export default function Header() {
             </Link>
           </div>
 
+          <div>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="px-3 py-1 text-sm border rounded">
+                  Log in / Sign up
+                </button>
+              </SignInButton>
+            </SignedOut>
+
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </div>
+
           {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="text-gray-600 hover:text-orange-500 transition-colors duration-200 font-medium"
             >
               Home
             </Link>
-            <Link 
-              href="/my-recipes" 
+            <Link
+              href="/my-recipes"
               className="text-gray-600 hover:text-orange-500 transition-colors duration-200 font-medium"
             >
               My Recipes
