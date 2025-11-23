@@ -69,103 +69,103 @@ export default function MyRecipesPage() {
     const handleImportConfirm = async () => {
         setShowRecipeImportLoadingModal(true);
         try {
-          // Step 1: Parse the recipe (GET request - no side effects)
-          const parseResponse = await fetch(`/api/recipes/parse?url=${encodeURIComponent(importUrl)}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-    
-          if (!parseResponse.ok) {
-            const errorData = await parseResponse.json();
-            throw new Error(errorData.error || 'Failed to parse recipe');
-          }
-    
-          const parseData = await parseResponse.json();
-          const parsedRecipe = parseData.data;
-    
-          if (!isRecipeComplete(parsedRecipe)) {
-            // Store incomplete recipe data in sessionStorage for autofill
-            const recipeDataToPass = {
-              title: parsedRecipe.title || '',
-              description: parsedRecipe.description || '',
-              image: parsedRecipe.image || '',
-              ingredients: parsedRecipe.ingredients || [],
-              instructions: parsedRecipe.instructions || []
-            };
-            sessionStorage.setItem('incompleteRecipe', JSON.stringify(recipeDataToPass));
-            setShowRecipeImportLoadingModal(false);
-            setShowImportModal(false);
-            router.push('/add-recipe');
-            return;
-          }
-    
-          // Step 2: Try to format the recipe (with fallback to parsedRecipe on error)
-          let recipeToUse = parsedRecipe; // Default to parsed recipe
-          
-          try {
-            const formatResponse = await fetch('/api/recipes/format', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                title: parsedRecipe.title,
-                description: parsedRecipe.description,
-                ingredients: parsedRecipe.ingredients,
-                instructions: parsedRecipe.instructions,
-              })
+            // Step 1: Parse the recipe (GET request - no side effects)
+            const parseResponse = await fetch(`/api/recipes/parse?url=${encodeURIComponent(importUrl)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             });
-    
-            if (formatResponse.ok) {
-              const formatData = await formatResponse.json();
-              if (formatData.success && formatData.data) {
-                recipeToUse = formatData.data;
-                console.log('Recipe formatted successfully');
-              } else {
-                console.warn('Format API returned unsuccessful response, using parsed recipe');
-              }
-            } else {
-              console.warn('Format API failed, falling back to parsed recipe');
+
+            if (!parseResponse.ok) {
+                const errorData = await parseResponse.json();
+                throw new Error(errorData.error || 'Failed to parse recipe');
             }
-          } catch (formatError) {
-            // If formatting fails, log the error but continue with parsedRecipe
-            console.warn('Error formatting recipe, using parsed recipe instead:', formatError);
-          }
-    
-          // Step 3: Create the recipe using formatted or parsed recipe
-          const createResponse = await fetch('/api/recipes', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              title: recipeToUse.title,
-              description: recipeToUse.description,
-              image: parsedRecipe.image,
-              ingredients: recipeToUse.ingredients,
-              instructions: recipeToUse.instructions,
-              recipeUrl: importUrl,
-              creatorId: parsedRecipe.creatorId || 'placeholder'
-            })
-          });
-    
-          if (!createResponse.ok) {
-            const errorData = await createResponse.json();
-            throw new Error(errorData.error || 'Failed to create recipe');
-          }
-    
-          const createData = await createResponse.json();
-          router.push('/recipes/' + createData.data.id);
+
+            const parseData = await parseResponse.json();
+            const parsedRecipe = parseData.data;
+
+            if (!isRecipeComplete(parsedRecipe)) {
+                // Store incomplete recipe data in sessionStorage for autofill
+                const recipeDataToPass = {
+                    title: parsedRecipe.title || '',
+                    description: parsedRecipe.description || '',
+                    image: parsedRecipe.image || '',
+                    ingredients: parsedRecipe.ingredients || [],
+                    instructions: parsedRecipe.instructions || []
+                };
+                sessionStorage.setItem('incompleteRecipe', JSON.stringify(recipeDataToPass));
+                setShowRecipeImportLoadingModal(false);
+                setShowImportModal(false);
+                router.push('/add-recipe');
+                return;
+            }
+
+            // Step 2: Try to format the recipe (with fallback to parsedRecipe on error)
+            let recipeToUse = parsedRecipe; // Default to parsed recipe
+
+            try {
+                const formatResponse = await fetch('/api/recipes/format', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title: parsedRecipe.title,
+                        description: parsedRecipe.description,
+                        ingredients: parsedRecipe.ingredients,
+                        instructions: parsedRecipe.instructions,
+                    })
+                });
+
+                if (formatResponse.ok) {
+                    const formatData = await formatResponse.json();
+                    if (formatData.success && formatData.data) {
+                        recipeToUse = formatData.data;
+                        console.log('Recipe formatted successfully');
+                    } else {
+                        console.warn('Format API returned unsuccessful response, using parsed recipe');
+                    }
+                } else {
+                    console.warn('Format API failed, falling back to parsed recipe');
+                }
+            } catch (formatError) {
+                // If formatting fails, log the error but continue with parsedRecipe
+                console.warn('Error formatting recipe, using parsed recipe instead:', formatError);
+            }
+
+            // Step 3: Create the recipe using formatted or parsed recipe
+            const createResponse = await fetch('/api/recipes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: recipeToUse.title,
+                    description: recipeToUse.description,
+                    image: parsedRecipe.image,
+                    ingredients: recipeToUse.ingredients,
+                    instructions: recipeToUse.instructions,
+                    recipeUrl: importUrl,
+                    creatorId: parsedRecipe.creatorId || 'placeholder'
+                })
+            });
+
+            if (!createResponse.ok) {
+                const errorData = await createResponse.json();
+                throw new Error(errorData.error || 'Failed to create recipe');
+            }
+
+            const createData = await createResponse.json();
+            router.push('/recipes/' + createData.data.id);
         } catch (error) {
-          console.error('Error importing recipe:', error);
-          alert(error instanceof Error ? error.message : 'Failed to import recipe');
+            console.error('Error importing recipe:', error);
+            alert(error instanceof Error ? error.message : 'Failed to import recipe');
         } finally {
             setShowRecipeImportLoadingModal(false);
-          setShowImportModal(false);
+            setShowImportModal(false);
         }
-      }
+    }
 
     return (
         <div className="flex flex-col items-center justify-center p-4 gap-4 py-8">

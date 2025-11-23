@@ -16,14 +16,6 @@ export default function Header() {
           </div>
 
           <div>
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="px-3 py-1 text-sm border rounded">
-                  Log in / Sign up
-                </button>
-              </SignInButton>
-            </SignedOut>
-
             <SignedIn>
               <UserButton />
             </SignedIn>
