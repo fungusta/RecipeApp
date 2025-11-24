@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deleteRecipe, getRecipeById, updateRecipe } from '@/lib/database';
 import { ensureDatabaseInitialized } from '@/lib/server-init';
+import { auth } from '@clerk/nextjs/server';
 
 export async function GET(request: NextRequest, { params }: {params: Promise<{ id: string }>}) {
     try {
@@ -11,15 +12,39 @@ export async function GET(request: NextRequest, { params }: {params: Promise<{ i
 
         const recipe = await getRecipeById(recipeId);
 
-        const parsedRecipe = recipe ? {
+        if (!recipe) {
+            return NextResponse.json(
+                { success: false, error: 'Recipe not found' },
+                { status: 404 }
+            );
+        }
+
+        let ingredients = recipe.ingredients;
+        let instructions = recipe.instructions;
+        
+        if (typeof recipe.ingredients === 'string') {
+            try {
+                ingredients = JSON.parse(recipe.ingredients);
+            } catch (e) {
+                console.error(`[GET /api/recipes/[id]] Failed to parse ingredients for recipe ${recipeId}:`, e);
+                ingredients = [];
+            }
+        }
+        
+        if (typeof recipe.instructions === 'string') {
+            try {
+                instructions = JSON.parse(recipe.instructions);
+            } catch (e) {
+                console.error(`[GET /api/recipes/[id]] Failed to parse instructions for recipe ${recipeId}:`, e);
+                instructions = [];
+            }
+        }
+
+        const parsedRecipe = {
             ...recipe,
-            ingredients: typeof recipe.ingredients === 'string'
-                ? JSON.parse(recipe.ingredients)
-                : recipe.ingredients,
-            instructions: typeof recipe.instructions === 'string'
-                ? JSON.parse(recipe.instructions)
-                : recipe.instructions
-        } : null;
+            ingredients,
+            instructions
+        };
 
         // Return successful response
         return NextResponse.json({
@@ -41,17 +66,48 @@ export async function GET(request: NextRequest, { params }: {params: Promise<{ i
 }
 
 export async function DELETE(request: NextRequest, { params }: {params: Promise<{ id: string }>}) {
+    const { userId } = await auth();
+    
+    if (!userId) {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const resolvedParams = await params;
+    const recipeId = resolvedParams.id;
+
     try {
         // Ensure database is initialized
-        await ensureDatabaseInitialized();        
+        await ensureDatabaseInitialized();
 
-        const resolvedParams = await params;
-        const recipeId = resolvedParams.id;
+        // Check if recipe exists and user owns it
+        const recipe = await getRecipeById(recipeId);
+        
+        if (!recipe) {
+            return NextResponse.json(
+                { success: false, error: 'Recipe not found' },
+                { status: 404 }
+            );
+        }
+
+        const recipeCreatorId = recipe.creatorId;
+        if (recipeCreatorId !== userId) {
+            return NextResponse.json(
+                { success: false, error: 'Forbidden: You do not own this recipe' },
+                { status: 403 }
+            );
+        }
 
         const success = await deleteRecipe(recipeId);
 
+        if (!success) {
+            return NextResponse.json(
+                { success: false, error: 'Recipe not found' },
+                { status: 404 }
+            );
+        }
+
         return NextResponse.json({
-            success: success,
+            success: true,
             message: 'Recipe deleted successfully'
         });
     } catch (error) {
@@ -68,18 +124,100 @@ export async function DELETE(request: NextRequest, { params }: {params: Promise<
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { userId } = await auth();
+    
+    if (!userId) {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const resolvedParams = await params;
+    const recipeId = resolvedParams.id;
+
     try {
+        const body = await request.json();
+        
+        // Validate request body
+        if (!body || typeof body !== 'object') {
+            return NextResponse.json({
+                success: false,
+                error: 'Invalid request body'
+            }, { status: 400 });
+        }
+
+        // Validate that at least one field is being updated
+        const allowedFields = ['title', 'description', 'category', 'ingredients', 'instructions', 'image', 'recipeUrl'];
+        const hasValidField = Object.keys(body).some(key => allowedFields.includes(key));
+        
+        if (!hasValidField) {
+            return NextResponse.json({
+                success: false,
+                error: 'No valid fields provided for update'
+            }, { status: 400 });
+        }
+
+        // Validate field types if provided
+        if (body.title !== undefined && typeof body.title !== 'string') {
+            return NextResponse.json({
+                success: false,
+                error: 'Title must be a string'
+            }, { status: 400 });
+        }
+
+        if (body.description !== undefined && typeof body.description !== 'string') {
+            return NextResponse.json({
+                success: false,
+                error: 'Description must be a string'
+            }, { status: 400 });
+        }
+
+        if (body.ingredients !== undefined && !Array.isArray(body.ingredients)) {
+            return NextResponse.json({
+                success: false,
+                error: 'Ingredients must be an array'
+            }, { status: 400 });
+        }
+
+        if (body.instructions !== undefined && !Array.isArray(body.instructions)) {
+            return NextResponse.json({
+                success: false,
+                error: 'Instructions must be an array'
+            }, { status: 400 });
+        }
+
         // Ensure database is initialized
         await ensureDatabaseInitialized();
-        
-        const resolvedParams = await params;
-        const recipeId = resolvedParams.id;
-        const body = await request.json();
 
-        const success = await updateRecipe(recipeId, body);
+        // Check if recipe exists and user owns it
+        const recipe = await getRecipeById(recipeId);
+        
+        if (!recipe) {
+            return NextResponse.json(
+                { success: false, error: 'Recipe not found' },
+                { status: 404 }
+            );
+        }
+
+        // Check ownership
+        const recipeCreatorId = recipe.creatorId;
+        if (recipeCreatorId !== userId) {
+            return NextResponse.json(
+                { success: false, error: 'Forbidden: You do not own this recipe' },
+                { status: 403 }
+            );
+        }
+
+        const updatedRecipe = await updateRecipe(recipeId, body);
+
+        if (!updatedRecipe) {
+            return NextResponse.json(
+                { success: false, error: 'Recipe not found' },
+                { status: 404 }
+            );
+        }
 
         return NextResponse.json({
-            success: success,
+            success: true,
+            data: updatedRecipe,
             message: 'Recipe updated successfully'
         });
     } catch (error) {

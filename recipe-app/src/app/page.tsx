@@ -33,9 +33,6 @@ export default function Home() {
     setLoadingRecipes(true);
     try {
       const url = new URL('/api/recipes', window.location.origin);
-      if (creatorId) {
-        url.searchParams.set('creatorId', creatorId);
-      }
 
       const response = await fetch(url.toString(), {
         method: 'GET',

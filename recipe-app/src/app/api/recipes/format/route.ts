@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Ingredient, Instruction } from "@/data/recipes";
 import { callOpenAI } from "@/lib/apis/openai";
 import { RECIPE_TEXT_FORMAT, removeDuplicateInstructionDescriptions } from "@/data/recipes";
+import { auth } from "@clerk/nextjs/server";
 
 /**
  * Request body interface for format endpoint
@@ -24,7 +25,7 @@ function craftFormattingPrompt(data: FormatRecipeRequest): string {
         instructions: data.instructions
     };
     const recipeJson = JSON.stringify(recipeData, null, 2);
-    
+
     return `
         Rewrite the recipe data below. Clean it, dedupe it, and improve clarity.
         Return ONLY valid JSON that follows the schema. No text outside JSON.
@@ -76,62 +77,55 @@ function craftFormattingPrompt(data: FormatRecipeRequest): string {
 }
 
 export async function POST(request: NextRequest) {
+    const { isAuthenticated } = await auth();
+
+    if (!isAuthenticated) {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const requestData: FormatRecipeRequest = body;
+
+    if (!requestData || typeof requestData !== 'object') {
+        return NextResponse.json({
+            success: false,
+            error: 'Invalid request body'
+        }, { status: 400 });
+    }
+
+    if (!requestData.title || typeof requestData.title !== 'string') {
+        return NextResponse.json({
+            success: false,
+            error: 'Title is required and must be a string'
+        }, { status: 400 });
+    }
+
+    if (!requestData.description || typeof requestData.description !== 'string') {
+        return NextResponse.json({
+            success: false,
+            error: 'Description is required and must be a string'
+        }, { status: 400 });
+    }
+
+    if (!Array.isArray(requestData.ingredients)) {
+        return NextResponse.json({
+            success: false,
+            error: 'Ingredients is required and must be an array'
+        }, { status: 400 });
+    }
+
+    if (!Array.isArray(requestData.instructions)) {
+        return NextResponse.json({
+            success: false,
+            error: 'Instructions is required and must be an array'
+        }, { status: 400 });
+    }
+
+    console.log('[Format API] Formatting recipe:', requestData.title);
+
+    const prompt = craftFormattingPrompt(requestData);
+
     try {
-        let requestData: FormatRecipeRequest;
-        
-        try {
-            const body = await request.json();
-            requestData = body;
-        } catch (error) {
-            return NextResponse.json({
-                success: false,
-                error: 'Request body is required'
-            }, { status: 400 });
-        }
-
-        // Validate request structure
-        if (!requestData || typeof requestData !== 'object') {
-            return NextResponse.json({
-                success: false,
-                error: 'Invalid request body'
-            }, { status: 400 });
-        }
-
-        // Validate required fields
-        if (!requestData.title || typeof requestData.title !== 'string') {
-            return NextResponse.json({
-                success: false,
-                error: 'Title is required and must be a string'
-            }, { status: 400 });
-        }
-
-        if (!requestData.description || typeof requestData.description !== 'string') {
-            return NextResponse.json({
-                success: false,
-                error: 'Description is required and must be a string'
-            }, { status: 400 });
-        }
-
-        if (!Array.isArray(requestData.ingredients)) {
-            return NextResponse.json({
-                success: false,
-                error: 'Ingredients is required and must be an array'
-            }, { status: 400 });
-        }
-
-        if (!Array.isArray(requestData.instructions)) {
-            return NextResponse.json({
-                success: false,
-                error: 'Instructions is required and must be an array'
-            }, { status: 400 });
-        }
-
-        console.log('[Format API] Formatting recipe:', requestData.title);
-
-        // Craft the OpenAI prompt
-        const prompt = craftFormattingPrompt(requestData);
-
-        // Call OpenAI API
         console.log('[Format API] Calling OpenAI for formatting...');
         const response = await callOpenAI(prompt, {
             format: RECIPE_TEXT_FORMAT
@@ -144,7 +138,6 @@ export async function POST(request: NextRequest) {
             }, { status: 500 });
         }
 
-        // Parse the JSON response
         let formattedData: any;
         try {
             formattedData = JSON.parse(response);
@@ -158,12 +151,11 @@ export async function POST(request: NextRequest) {
             }, { status: 500 });
         }
 
-        // Extract recipe from response (RECIPE_TEXT_FORMAT returns { recipe: [...] })
         let formattedRecipe = null;
         if (formattedData.recipe) {
             // If it's an array, take the first recipe
-            formattedRecipe = Array.isArray(formattedData.recipe) 
-                ? formattedData.recipe[0] 
+            formattedRecipe = Array.isArray(formattedData.recipe)
+                ? formattedData.recipe[0]
                 : formattedData.recipe;
         } else if (formattedData.title) {
             // If it's already a recipe object

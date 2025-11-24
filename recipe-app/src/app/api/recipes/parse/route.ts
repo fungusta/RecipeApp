@@ -1,9 +1,9 @@
-import { createRecipe, Recipe } from "@/lib/database";
+import { Recipe } from "@/lib/database";
 import { NextRequest, NextResponse } from "next/server";
-import { ensureDatabaseInitialized } from "@/lib/server-init";
 import { normalizeUrl, parseUrl } from "@/lib/parsers/urlParser";
 
 async function parseRecipe(url: string): Promise<Recipe | null> {
+
     const normalizedUrl = normalizeUrl(url);
     const strategy = await parseUrl(normalizedUrl);
     
