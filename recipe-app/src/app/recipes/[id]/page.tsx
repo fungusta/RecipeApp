@@ -3,12 +3,16 @@ import IngredientsSection from '@/components/IngredientsSection';
 import CookingSection from '@/components/CookingSection';
 import { getRecipeById } from '@/lib/database';
 import EditButton from '@/components/EditButton';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 
 interface PageProps {
     params: Promise<{ id: string }>;
 }
 
 export default async function RecipePage({ params }: PageProps) {
+    const { userId } = await auth();
+
     const resolvedParams = await params;
     const recipeId = resolvedParams.id;
 
@@ -21,6 +25,21 @@ export default async function RecipePage({ params }: PageProps) {
                     <h1 className="text-2xl font-bold text-gray-800 mb-4">Recipe Not Found</h1>
                     <p className="text-gray-600">The recipe you're looking for doesn't exist.</p>
                 </div>
+            </div>
+        );
+    }
+
+    // Check ownership - handle both camelCase and snake_case field names
+    const recipeCreatorId = (recipe as any).creatorId || (recipe as any).creator_id;
+    if (recipeCreatorId !== userId) {
+        return (
+            <div className="flex items-center justify-center py-16">
+                <Card className="w-full max-w-2xl" backgroundColor="bg-orange-350">
+                    <div className="text-center">
+                        <h1 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h1>
+                        <p className="text-gray-600">You do not have permission to view this recipe.</p>
+                    </div>
+                </Card>
             </div>
         );
     }

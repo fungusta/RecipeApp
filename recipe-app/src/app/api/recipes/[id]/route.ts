@@ -7,6 +7,12 @@ export async function GET(request: NextRequest, { params }: {params: Promise<{ i
     try {
         await ensureDatabaseInitialized();
 
+        const { userId } = await auth();
+        
+        if (!userId) {
+            return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+        }
+
         const resolvedParams = await params;
         const recipeId = resolvedParams.id;
 
@@ -16,6 +22,15 @@ export async function GET(request: NextRequest, { params }: {params: Promise<{ i
             return NextResponse.json(
                 { success: false, error: 'Recipe not found' },
                 { status: 404 }
+            );
+        }
+
+        // Check ownership - handle both camelCase and snake_case field names
+        const recipeCreatorId = (recipe as any).creatorId || (recipe as any).creator_id;
+        if (recipeCreatorId !== userId) {
+            return NextResponse.json(
+                { success: false, error: 'Forbidden: You do not have access to this recipe' },
+                { status: 403 }
             );
         }
 

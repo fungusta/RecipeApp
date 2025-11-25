@@ -10,11 +10,12 @@ import { useRouter } from "next/navigation";
 import Modal, { ConfirmModal, LoadingModal } from "@/components/Modal";
 import { Recipe } from "@/data/recipes";
 import { isRecipeComplete } from "@/lib/utils/recipe/recipeValidation";
+import { useAuth } from "@clerk/nextjs";
 
-const creatorId = "placeholder";
 
 export default function MyRecipesPage() {
     const router = useRouter();
+    const { isSignedIn } = useAuth();
     const [searchValue, setSearchValue] = useState('');
     const [showImportModal, setShowImportModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -24,16 +25,15 @@ export default function MyRecipesPage() {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
 
     useEffect(() => {
-        fetchRecipes();
-    }, []);
+        if (isSignedIn) {
+            fetchRecipes();
+        }
+    }, [isSignedIn]);
 
     async function fetchRecipes() {
         setLoadingRecipes(true);
         try {
             const url = new URL('/api/recipes', window.location.origin);
-            if (creatorId) {
-                url.searchParams.set('creatorId', creatorId);
-            }
 
             const response = await fetch(url.toString(), {
                 method: 'GET',
@@ -146,8 +146,7 @@ export default function MyRecipesPage() {
                     image: parsedRecipe.image,
                     ingredients: recipeToUse.ingredients,
                     instructions: recipeToUse.instructions,
-                    recipeUrl: importUrl,
-                    creatorId: parsedRecipe.creatorId || 'placeholder'
+                    recipeUrl: importUrl
                 })
             });
 
@@ -199,7 +198,7 @@ export default function MyRecipesPage() {
                 <RecipeSkeleton count={10} />
             ) : recipes.length === 0 ? (
                 <div className="w-full max-w-xl">
-                    <Card className="flex flex-col items-center justify-center p-8">
+                    <Card className="flex flex-col items-center justify-center p-8" backgroundColor="bg-lime-300">
                         <p className="text-gray-600 text-center">No recipes found. Start by adding or importing a recipe!</p>
                     </Card>
                 </div>
