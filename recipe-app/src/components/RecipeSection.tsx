@@ -35,7 +35,7 @@ export default function RecipeSection({ header, items, viewMoreLink }: RecipeSec
       className="mb-4"
     >
       <div className="flex items-center justify-between mb-4">
-        <div className="text-lg">{header}</div>
+        <h2 className="text-xl font-bold text-gray-800">{header}</h2>
         {viewMoreLink && (
           <CircularButton
             onClick={handleViewMore}

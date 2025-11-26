@@ -18,7 +18,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Recipe App",
+  title: "Homecooked",
   description: "Discover and manage your favorite recipes",
 };
 
@@ -45,7 +45,7 @@ export default function RootLayout({
                 >
                   <div className="space-y-3">
                     <p className="uppercase tracking-[0.2em] text-xs text-orange-500 font-semibold">
-                      Recipe App
+                      Homecooked
                     </p>
                   </div>
                   <SignInButton mode="modal" forceRedirectUrl="/">
@@ -60,9 +60,6 @@ export default function RootLayout({
               {children}
             </SignedIn>
           </main>
-          <SignedIn>
-            <Footer />
-          </SignedIn>
         </body>
       </html>
     </ClerkProvider>

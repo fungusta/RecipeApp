@@ -11,7 +11,7 @@ export default function Header() {
           {/* Logo/Brand */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <span className="text-xl font-bold text-gray-800">Recipe App</span>
+              <span className="text-xl font-bold text-gray-800">Homecooked</span>
             </Link>
           </div>
 

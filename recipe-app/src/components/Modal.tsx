@@ -151,11 +151,11 @@ export function ConfirmModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
       <div className="space-y-4">
-        <p className="text-gray-600">{message}</p>
+        <p className="text-base text-gray-600">{message}</p>
         <div className="flex justify-end space-x-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+            className="px-4 py-2 font-medium text-gray-600 hover:text-gray-800 transition-colors duration-200"
           >
             {cancelText}
           </button>
@@ -195,7 +195,7 @@ export function LoadingModal({
         <div className="flex justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
         </div>
-        <p className="text-gray-600">{message}</p>
+        <p className="text-base text-gray-600">{message}</p>
       </div>
     </Modal>
   );

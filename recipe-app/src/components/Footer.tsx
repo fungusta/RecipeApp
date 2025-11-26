@@ -6,7 +6,7 @@ export default function Footer() {
           {/* Brand section */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <span className="text-xl font-bold text-gray-800">Recipe App</span>
+              <span className="text-xl font-bold text-gray-800">Homecooked</span>
             </div>
             <p className="text-gray-600 text-sm max-w-md">
               Discover, save, and share your favorite recipes. Create your personal cookbook 
@@ -72,7 +72,7 @@ export default function Footer() {
         <div className="mt-8 pt-8 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} Recipe App. All rights reserved.
+              © {new Date().getFullYear()} Homecooked. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <a href="#" className="text-gray-400 hover:text-orange-500 transition-colors duration-200">

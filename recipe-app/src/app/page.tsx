@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
-import SearchBar from '@/components/SearchBar';
 import RecipeSection from '@/components/RecipeSection';
 import CircularButton from '@/components/CircularButton';
-import ImportRecipesSection from '@/components/ImportRecipesSection';
 import RecipeSkeleton from '@/components/RecipeSkeleton';
 import Modal, { ConfirmModal, LoadingModal } from '@/components/Modal';
 import { useRouter } from 'next/navigation';
@@ -15,7 +13,6 @@ import { useAuth } from '@clerk/nextjs';
 export default function Home() {
   const router = useRouter();
   const { isSignedIn } = useAuth();
-  const [searchValue, setSearchValue] = useState('');
   const [importUrl, setImportUrl] = useState('');
   const [myRecipes, setMyRecipes] = useState([]);
   const [loadingRecipes, setLoadingRecipes] = useState(false);
@@ -50,14 +47,6 @@ export default function Home() {
       setLoadingRecipes(false);
     }
   }
-
-  const handleSearchChange = (value: string) => {
-    setSearchValue(value);
-  };
-
-  const handleClear = () => {
-    setSearchValue('');
-  };
 
   const handleAddRecipe = () => {
     router.push('/add-recipe');
@@ -172,28 +161,45 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center p-4 gap-4 py-8">
           <Card className="w-full max-w-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-gray-800">Recipe App</h1>
-              <CircularButton
-                onClick={handleAddRecipe}
-                variant="primary"
-                size="md"
-                title="Add new recipe"
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-              </CircularButton>
-            </div>
-            <SearchBar
-              value={searchValue}
-              onChange={handleSearchChange}
-              onClear={handleClear}
-              placeholder="Search recipes..."
-            />
+            <div className="flex flex-col items-center gap-4 py-6">
+              {/* Welcome Section */}
+              <div className="text-center mb-2">
+                <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to Homecooked</h1>
+                <p className="text-base text-gray-600">Create, import, and manage your favorite recipes</p>
+              </div>
 
-            {/* Import Recipes Section */}
-            <ImportRecipesSection onImportClick={handleRecipeImport} />
+              <div className="flex items-center justify-center gap-8 w-full">
+                {/* Add Recipe Button */}
+                <div className="flex flex-col items-center gap-2">
+                  <CircularButton
+                    onClick={handleAddRecipe}
+                    variant="primary"
+                    size="lg"
+                    title="Add new recipe"
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </CircularButton>
+                  <span className="text-sm font-medium text-gray-600">Add Recipe</span>
+                </div>
+
+                {/* Import Recipe Button */}
+                <div className="flex flex-col items-center gap-2">
+                  <CircularButton
+                    onClick={handleRecipeImport}
+                    variant="primary"
+                    size="lg"
+                    title="Import recipe from URL"
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                  </CircularButton>
+                  <span className="text-sm font-medium text-gray-600">Import Recipe</span>
+                </div>
+              </div>
+            </div>
           </Card>
           {loadingRecipes ? (
             <RecipeSkeleton count={6} />

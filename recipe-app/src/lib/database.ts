@@ -8,6 +8,7 @@ function getDbConfig() {
   const dbUser = process.env.DB_USER || 'root';
   const dbName = process.env.DB_NAME || 'recipe_db';
   const dbPort = parseInt(process.env.DB_PORT || '3306');
+  const dbSsl = process.env.DB_SSL !== 'false'; // Default to true (required for Azure)
 
   // Warn if password might have issues
   if (dbPassword && (dbPassword.startsWith(' ') || dbPassword.endsWith(' '))) {
@@ -17,7 +18,7 @@ function getDbConfig() {
     console.warn('⚠️ WARNING: DB_PASSWORD is empty string!');
   }
   
-  return {
+  const config: mysql.PoolOptions = {
     host: dbHost,
     user: dbUser,
     password: dbPassword,
@@ -27,6 +28,15 @@ function getDbConfig() {
     connectionLimit: 10,
     queueLimit: 0,
   };
+
+  // Azure Database for MySQL requires SSL
+  if (dbSsl) {
+    config.ssl = {
+      rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false', // Default to true for security
+    };
+  }
+  
+  return config;
 }
 
 // Create connection pool lazily

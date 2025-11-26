@@ -14,7 +14,7 @@ export default function LoginPage() {
         >
           <div className="space-y-3">
             <p className="uppercase tracking-[0.2em] text-xs text-orange-500 font-semibold">
-              Recipe App
+              Homecooked
             </p>
           </div>
             <SignInButton mode="modal" forceRedirectUrl="/">

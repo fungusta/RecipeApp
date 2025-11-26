@@ -182,15 +182,7 @@ export default function MyRecipesPage() {
                         </svg>
                     </CircularButton>
                 </div>
-                <SearchBar
-                    value={searchValue}
-                    onChange={handleSearchChange}
-                    onClear={handleClear}
-                    placeholder="Search recipes..."
-                />
 
-                {/* Import Recipes Section */}
-                <ImportRecipesSection onImportClick={handleRecipeImport} />
             </Card>
 
             {/* Recipe Section */}
@@ -199,7 +191,7 @@ export default function MyRecipesPage() {
             ) : recipes.length === 0 ? (
                 <div className="w-full max-w-xl">
                     <Card className="flex flex-col items-center justify-center p-8" backgroundColor="bg-lime-300">
-                        <p className="text-gray-600 text-center">No recipes found. Start by adding or importing a recipe!</p>
+                        <p className="text-base text-gray-600 text-center">No recipes found. Start by adding or importing a recipe!</p>
                     </Card>
                 </div>
             ) : (
@@ -217,7 +209,7 @@ export default function MyRecipesPage() {
                                     alt={recipe.title}
                                     className="w-24 h-24 object-cover rounded-lg"
                                 />
-                                <p className="text-sm font-medium text-center">{recipe.title}</p>
+                                <p className="text-sm font-medium text-gray-800 text-center">{recipe.title}</p>
                             </Card>
                         ))}
                     </div>
@@ -267,7 +259,7 @@ export default function MyRecipesPage() {
 
                     <button
                         onClick={handleImportConfirm}
-                        className="w-full bg-lime-200 hover:bg-lime-300 text-gray-800 font-medium py-3 px-6 rounded-lg shadow-md transition-colors duration-200"
+                        className="w-full bg-lime-200 hover:bg-lime-300 font-medium text-gray-800 py-3 px-6 rounded-lg shadow-md transition-colors duration-200"
                     >
                         Import
                     </button>
